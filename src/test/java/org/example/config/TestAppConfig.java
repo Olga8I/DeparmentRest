@@ -3,7 +3,10 @@ package org.example.config;
 import liquibase.integration.spring.SpringLiquibase;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -13,10 +16,10 @@ import java.util.Properties;
 
 @Configuration
 @ComponentScan(basePackages = "org.example")
-@PropertySource("classpath:database.properties")
-public class AppConfig {
+@PropertySource("classpath:db.properties")
+public class TestAppConfig {
 
-    @Value("${db.driver-class-name}")
+    @Value("${db.driverClassName}")
     private String driverClassName;
 
     @Value("${db.url}")
@@ -55,15 +58,13 @@ public class AppConfig {
         return emf;
     }
 
-    @Bean
+     @Bean
     public SpringLiquibase liquibase(DataSource dataSource) {
         SpringLiquibase liquibase = new SpringLiquibase();
-        liquibase.setDataSource(dataSource);
-        liquibase.setChangeLog("classpath:db/db.changelog-master.xml");
-        return liquibase;
+      liquibase.setDataSource(dataSource);
+      liquibase.setChangeLog("classpath:db/db.xml");
+      return liquibase;
     }
-
-
 
     @Bean
     public JpaTransactionManager transactionManager() {
@@ -71,5 +72,4 @@ public class AppConfig {
         transactionManager.setEntityManagerFactory(entityManagerFactory(dataSource()).getObject());
         return transactionManager;
     }
-
 }
