@@ -4,32 +4,34 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import jakarta.persistence.EntityManagerFactory;
 import liquibase.integration.spring.SpringLiquibase;
-import org.springframework.context.annotation.*;
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.util.ResourceUtils;
 
 import javax.sql.DataSource;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
-@EnableJpaRepositories("org.example.repository")
-@EnableTransactionManagement
 @Configuration
 @ComponentScan(basePackages = "org.example")
-@PropertySource("classpath:database.properties")
-public class AppConfig {
+@PropertySource("classpath:db.properties")
+public class TestAppConfig {
 
     private final Environment env;
 
-    public AppConfig(Environment env) {
+    public TestAppConfig(Environment env) {
         this.env = env;
     }
 
