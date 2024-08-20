@@ -6,7 +6,6 @@ services:
     image: postgres:latest
     hostname: postgres
     environment:
-      # libqp env var for healthcheck
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mysecretpassword

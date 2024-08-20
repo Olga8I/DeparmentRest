@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 /**
  * Phone entity
- * One To One: PhoneNumber - User
+ * Many To One: PhoneNumber - User
  */
 @Entity
 public class PhoneNumber {
@@ -14,7 +14,7 @@ public class PhoneNumber {
 
     private String number;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 

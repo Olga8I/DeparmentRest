@@ -4,7 +4,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.example.config.AppConfig;
 
 
-public class Main {
+public class Application {
 
 
     public static void main(String[] args) {
