@@ -13,7 +13,7 @@ import java.util.Properties;
 
 @Configuration
 @ComponentScan(basePackages = "org.example")
-@PropertySource("classpath:db.properties")
+@PropertySource("classpath:database.properties")
 public class AppConfig {
 
     @Value("${db.driver-class-name}")
@@ -55,13 +55,13 @@ public class AppConfig {
         return emf;
     }
 
-    @Bean
+    /*@Bean
     public SpringLiquibase liquibase(DataSource dataSource) {
         SpringLiquibase liquibase = new SpringLiquibase();
         liquibase.setDataSource(dataSource);
         liquibase.setChangeLog("classpath:db/db.xml");
         return liquibase;
-    }
+    }*/
 
 
     @Bean
