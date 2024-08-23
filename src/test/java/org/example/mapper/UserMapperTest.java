@@ -37,7 +37,6 @@ class UserMapperTest {
         assertEquals(dto.getLastName(), user.getLastName());
         assertNotNull(user.getRole());
         assertEquals(dto.getRoleDto().getName(), user.getRole().getName());
-
         assertNotNull(user.getPhoneNumberList());
         assertNotNull(user.getDepartmentList());
     }

@@ -3,7 +3,6 @@ package org.example.service;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.example.dto.DepartmentCreateDto;
 import org.example.dto.DepartmentResponseDto;
 import org.example.dto.DepartmentUpdateDto;
@@ -12,6 +11,7 @@ import org.example.mapper.DepartmentMapper;
 import org.example.model.Department;
 import org.example.repository.DepartmentRepository;
 import org.example.service.impl.DepartmentServiceImpl;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -36,12 +37,14 @@ public class DepartmentServiceTest {
 
     private DepartmentCreateDto departmentCreateDto;
     private DepartmentUpdateDto departmentUpdateDto;
+    private DepartmentResponseDto departmentResponseDto;
     private Department department;
 
     @BeforeEach
     public void setUp() {
         departmentCreateDto = new DepartmentCreateDto("HR");
         departmentUpdateDto = new DepartmentUpdateDto(1L, "HR");
+        departmentResponseDto = new DepartmentResponseDto(1L, "HR",null);
 
         department = new Department("HR");
         department.setId(1L);
@@ -74,9 +77,10 @@ public class DepartmentServiceTest {
     @Test
     public void testFindById() throws NotFoundException {
         when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
+        when(departmentMapper.mapToDto(department)).thenReturn(departmentResponseDto);
         DepartmentResponseDto foundDepartment = departmentService.findById(department.getId());
         verify(departmentRepository).findById(department.getId());
-        org.junit.jupiter.api.Assertions.assertEquals(department.getName(), foundDepartment.getName());
+        Assertions.assertEquals(department.getName(), foundDepartment.getName());
     }
 
     @Test

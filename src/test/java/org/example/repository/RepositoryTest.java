@@ -3,22 +3,16 @@ package org.example.repository;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import jakarta.persistence.EntityManagerFactory;
-import org.example.config.TestAppConfig;
 import org.example.model.Department;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ResourceUtils;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -32,28 +26,32 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
+@SpringJUnitConfig(RepositoryTest.Config.class)
 @Testcontainers
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = TestAppConfig.class)
-@Tag("DockerRequired")
 class RepositoryTest {
 
+
     @Container
-    private static final PostgreSQLContainer<?> container =
-            new PostgreSQLContainer<>("postgres:latest")
-                    .withDatabaseName("postgres");
+    public static PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:latest")
+            .withDatabaseName("testdata")
+            .withUsername("testname")
+            .withPassword("testpassword");
 
     @BeforeAll
-    public static void setUp() {
-        container.start();
-        System.setProperty("spring.datasource.url", container.getJdbcUrl());
-        System.setProperty("spring.datasource.username", container.getUsername());
-        System.setProperty("spring.datasource.password", container.getPassword());
+    public static void start() {
+        postgresContainer.start();
+
+    }
+
+    @AfterAll
+    public static void teardown() {
+        postgresContainer.stop();
     }
 
     @Configuration
     @EnableJpaRepositories(basePackages = "org.example.repository")
-    @PropertySource("classpath:testdb.properties")
+    @PropertySource("classpath:databasetest.properties")
     static class Config {
         private final Environment env;
 
@@ -61,9 +59,9 @@ class RepositoryTest {
             this.env = env;
         }
 
-        private String loadSql(String path){
+        private String loadSql(String path) {
             String schemeSql;
-            try(BufferedReader br = new BufferedReader(new FileReader(ResourceUtils.getFile(path).getAbsolutePath()))){
+            try (BufferedReader br = new BufferedReader(new FileReader(ResourceUtils.getFile(path).getAbsolutePath()))) {
                 schemeSql = br.lines().collect(Collectors.joining());
             } catch (IOException e) {
                 throw new IllegalStateException("Could not load sql script", e);
@@ -74,11 +72,11 @@ class RepositoryTest {
         @Bean
         public DataSource dataSource() {
             var config = new HikariConfig();
-            config.setDriverClassName(env.getProperty("db.driver"));
-            config.setJdbcUrl(env.getProperty("db.url"));
-            config.setUsername(env.getProperty("db.username"));
-            config.setPassword(env.getProperty("db.password"));
-            config.setConnectionInitSql(loadSql("classpath:schema.sql"));//вопрос
+            config.setDriverClassName(postgresContainer.getDriverClassName());
+            config.setJdbcUrl(postgresContainer.getJdbcUrl());
+            config.setUsername(postgresContainer.getUsername());
+            config.setPassword(postgresContainer.getPassword());
+            config.setConnectionInitSql(loadSql("classpath:schemaTest.sql"));
             return new HikariDataSource(config);
         }
 
@@ -109,18 +107,13 @@ class RepositoryTest {
     void findById() {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Config.class);
         departmentRepository = context.getBean(DepartmentRepository.class);
-
         Department foundDepartment = departmentRepository.findById(1L).orElse(null);
-
-       // assertThat(foundDepartment).isNotNull();
-       // assert foundDepartment != null;
-      //  assertThat(foundDepartment.getName()).isEqualTo("Testing");
-
+        Assertions.assertNotNull(foundDepartment);
         context.close();
     }
 
     @Test
-    void findAll(){
+    void findAll() {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Config.class);
         departmentRepository = context.getBean(DepartmentRepository.class);
 
@@ -136,7 +129,7 @@ class RepositoryTest {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Config.class);
         departmentRepository = context.getBean(DepartmentRepository.class);
 
-        //departmentRepository.save(new Department(1L, "Testing1"));
+        departmentRepository.save(new Department("HR"));
 
         Assertions.assertTrue(departmentRepository.findById(1L).isPresent());
 

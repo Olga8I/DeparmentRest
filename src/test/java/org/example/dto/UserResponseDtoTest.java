@@ -14,7 +14,9 @@ class UserResponseDtoTest {
         assertNull(userResponseDto.getFirstName());
         assertNull(userResponseDto.getLastName());
         assertNull(userResponseDto.getRoleDto());
+        assertNotNull(userResponseDto.getPhoneNumberList()); // Проверяем, что список не null
         assertTrue(userResponseDto.getPhoneNumberList().isEmpty());
+        assertNotNull(userResponseDto.getDepartmentList()); // Проверяем, что множество не null
         assertTrue(userResponseDto.getDepartmentList().isEmpty());
     }
 

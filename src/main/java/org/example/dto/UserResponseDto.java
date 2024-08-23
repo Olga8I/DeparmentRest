@@ -1,5 +1,6 @@
 package org.example.dto;
-
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -12,6 +13,8 @@ public class UserResponseDto {
     private Set<DepartmentCreateDto> departmentCreateDtoList;
 
     public UserResponseDto() {
+        this.phoneNumberResponseDtoList = new ArrayList<>();
+        this.departmentCreateDtoList = new HashSet<>();
     }
 
     public UserResponseDto(String firstName, String lastName, RoleResponseDto roleResponseDto, List<PhoneNumberResponseDto> phoneNumberList,
@@ -27,7 +30,9 @@ public class UserResponseDto {
         return id;
     }
 
-    public void setId(Long id) {this.id = id;}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -69,6 +74,3 @@ public class UserResponseDto {
         this.departmentCreateDtoList = departmentList;
     }
 }
-
-
-

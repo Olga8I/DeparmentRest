@@ -1,19 +1,17 @@
 package org.example.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.example.dto.DepartmentCreateDto;
 import org.example.dto.DepartmentResponseDto;
 import org.example.dto.DepartmentUpdateDto;
 import org.example.service.DepartmentService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/departments")
-@Validated
+@RequestMapping("/api")
 public class DepartmentController {
 
     private final DepartmentService departmentService;
@@ -22,33 +20,33 @@ public class DepartmentController {
         this.departmentService = departmentService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<DepartmentResponseDto> getDepartmentById(@PathVariable Long id) {
+    @GetMapping(value = "/departments/{id}")
+    public ResponseEntity<DepartmentResponseDto> getDepartmentById(@PathVariable("id") Long id) {
         DepartmentResponseDto departmentResponseDto = departmentService.findById(id);
         return ResponseEntity.ok(departmentResponseDto);
     }
 
-    @GetMapping("/all")
+    @GetMapping(value = "/departments/all")
     public ResponseEntity<List<DepartmentResponseDto>> getAllDepartments() {
         List<DepartmentResponseDto> departments = departmentService.findAll();
         return ResponseEntity.ok(departments);
     }
 
-    @PostMapping
+    @PostMapping(value = "/departments")
     public ResponseEntity<String> createDepartment(@RequestBody DepartmentCreateDto departmentCreateDto) {
         departmentService.save(departmentCreateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Department " + departmentCreateDto.getName() + " was created");
     }
 
-    @PutMapping
+    @PutMapping(value = "/departments")
     public ResponseEntity<String> updateDepartment(@RequestBody DepartmentUpdateDto departmentUpdateDto) {
         departmentService.update(departmentUpdateDto);
-        return ResponseEntity.ok("Department id " + departmentUpdateDto.getId() + " was updated");
+        return ResponseEntity.ok("Department " + departmentUpdateDto.getId() + " was updated");
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteDepartment(@PathVariable Long id) {
+    @DeleteMapping("/departments/{id}")
+    public ResponseEntity<String> deleteDepartment(@PathVariable("id") Long id) {
         departmentService.delete(id);
-        return ResponseEntity.ok("Department id " + id + " was deleted");
+        return ResponseEntity.ok("Department " + id + " was deleted");
     }
 }

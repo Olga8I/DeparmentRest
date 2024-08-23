@@ -10,7 +10,8 @@ public class DepartmentResponseDto {
 
     public DepartmentResponseDto() {}
 
-    public DepartmentResponseDto(String name, List<UserResponseDto> userListDto) {
+    public DepartmentResponseDto(Long id, String name, List<UserResponseDto> userListDto) {
+        this.id = id;
         this.name = name;
         this.userList = userListDto;
     }

@@ -26,9 +26,13 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public RoleResponseDto save(RoleCreateDto roleCreateDto) {
+    public void save(RoleCreateDto roleCreateDto) {
         Role role = roleMapper.mapToEntity(roleCreateDto);
-        return roleMapper.mapToDto(role);
+        if (role.getName() == null) {
+            throw new IllegalArgumentException("Role must have an name");
+        }
+        roleRepository.save(role);
+
     }
 
     @Override

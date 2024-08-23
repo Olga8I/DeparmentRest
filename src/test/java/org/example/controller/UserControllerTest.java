@@ -1,42 +1,35 @@
 package org.example.controller;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.example.dto.UserCreateDto;
 import org.example.dto.UserResponseDto;
 import org.example.dto.UserUpdateDto;
 import org.example.service.UserService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
-public class UserControllerTest {
+import static org.mockito.Mockito.*;
 
-    private MockMvc mockMvc;
+class UserControllerTest {
+    @InjectMocks
+    private UserController userController;
 
     @Mock
     private UserService userService;
 
-    @InjectMocks
-    private UserController userController;
-
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
     }
 
     @Test
-    public void getUserById_ShouldReturnUser() throws Exception {
+    void testGetUserById() {
         UserResponseDto userResponseDto = new UserResponseDto();
         userResponseDto.setId(1L);
         userResponseDto.setFirstName("John");
@@ -44,71 +37,67 @@ public class UserControllerTest {
 
         when(userService.findById(1L)).thenReturn(userResponseDto);
 
-        mockMvc.perform(get("/api/users/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.firstName").value("John"))
-                .andExpect(jsonPath("$.lastName").value("Doe"));
+        UserResponseDto user = userController.getUserById(1L);
+        Assertions.assertNotNull(user);
+        Assertions.assertEquals(user.getId(), userResponseDto.getId());
+        Assertions.assertEquals(user.getFirstName(), userResponseDto.getFirstName());
+        Assertions.assertEquals(user.getLastName(), userResponseDto.getLastName());
     }
 
     @Test
-    public void getAllUsers_ShouldReturnListOfUsers() throws Exception {
+    void testGetAllUsers() {
+        List<UserResponseDto> users = new ArrayList<>();
         UserResponseDto user1 = new UserResponseDto();
         user1.setId(1L);
         user1.setFirstName("John");
         user1.setLastName("Doe");
+        users.add(user1);
 
         UserResponseDto user2 = new UserResponseDto();
         user2.setId(2L);
         user2.setFirstName("Jane");
         user2.setLastName("Doe");
-
-        List<UserResponseDto> users = Arrays.asList(user1, user2);
+        users.add(user2);
 
         when(userService.findAll()).thenReturn(users);
 
-        mockMvc.perform(get("/api/users/all"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].firstName").value("John"))
-                .andExpect(jsonPath("$[1].firstName").value("Jane"));
+        List<UserResponseDto> responseDtoList = userController.getAllUsers();
+        Assertions.assertNotNull(responseDtoList);
+        Assertions.assertEquals(2, responseDtoList.size());
+        Assertions.assertEquals("John", responseDtoList.get(0).getFirstName());
+        Assertions.assertEquals("Jane", responseDtoList.get(1).getFirstName());
     }
 
     @Test
-    public void createUser_ShouldReturnCreatedMessage() throws Exception {
+    void testCreateUser() {
         UserCreateDto userCreateDto = new UserCreateDto();
         userCreateDto.setFirstName("John");
         userCreateDto.setLastName("Doe");
 
-        doNothing().when(userService).save(any(UserCreateDto.class));
+        doNothing().when(userService).save(userCreateDto);
 
-        mockMvc.perform(post("/api/users")
-                        .contentType("application/json")
-                        .content("{\"firstName\": \"John\", \"lastName\": \"Doe\"}"))
-                .andExpect(status().isCreated())
-                .andExpect(content().string("User John Doe was created"));
+        String result = userController.createUser(userCreateDto);
+        Assertions.assertEquals(result, "User John Doe was created");
     }
 
     @Test
-    public void updateUser_ShouldReturnUpdateMessage() throws Exception {
+    void testUpdateUser() {
         UserUpdateDto userUpdateDto = new UserUpdateDto();
         userUpdateDto.setId(1L);
         userUpdateDto.setFirstName("John");
         userUpdateDto.setLastName("Doe");
 
-        doNothing().when(userService).update(any(UserUpdateDto.class));
+        doNothing().when(userService).update(userUpdateDto);
 
-        mockMvc.perform(put("/api/users")
-                        .contentType("application/json")
-                        .content("{\"id\":1, \"firstName\": \"John\", \"lastName\": \"Doe\"}"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("User 1 was updated"));
+        String result = userController.updateUser(userUpdateDto);
+        Assertions.assertEquals(result, "User with id " + userUpdateDto.getId() + " was updated");
     }
 
     @Test
-    public void deleteUser_ShouldReturnDeletedMessage() throws Exception {
+    void testDeleteUser() {
         doNothing().when(userService).delete(1L);
 
-        mockMvc.perform(delete("/api/users/1"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("User 1 was deleted"));
+        String result = userController.deleteUser(1L);
+        Assertions.assertEquals(result, "User with id " + 1L + " was deleted");
     }
 }

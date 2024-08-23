@@ -22,7 +22,8 @@ public class Department {
     @Column (name = "department_name")
     private String name;
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_department", joinColumns = @JoinColumn (name = "department_id"), inverseJoinColumns = @JoinColumn (name = "user_id"))
+    @JoinTable(name = "user_department", joinColumns = @JoinColumn (name = "department_id"),
+            inverseJoinColumns = @JoinColumn (name = "user_id"))
     private Set<User> userList;
 
     public Department(){

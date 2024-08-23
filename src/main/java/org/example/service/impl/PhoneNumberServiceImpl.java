@@ -28,6 +28,7 @@ public class PhoneNumberServiceImpl implements PhoneNumberService {
     @Override
     public void save(PhoneNumberCreateDto phoneNumberCreateDto) {
         PhoneNumber phoneNumber = phoneNumberMapper.mapToEntity(phoneNumberCreateDto);
+        phoneNumberRepository.save(phoneNumber);
     }
 
     @Override

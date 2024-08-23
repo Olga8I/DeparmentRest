@@ -21,9 +21,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column (name = "user_id")
     private Long id;
-    @Column (name = "user_first_name")
+    @Column (name = "user_firstName")
     private String firstName;
-    @Column (name = "user_last_name")
+    @Column (name = "user_lastName")
     private String lastName;
 
     @ManyToOne(fetch = FetchType.EAGER)

@@ -1,4 +1,5 @@
 package org.example.mapper;
+
 import org.example.dto.PhoneNumberCreateDto;
 import org.example.dto.PhoneNumberResponseDto;
 import org.example.dto.PhoneNumberUpdateDto;
@@ -40,7 +41,7 @@ class PhoneNumberMapperTest {
     void testMapToDTO() {
         PhoneNumber phoneNumber = new PhoneNumber();
         phoneNumber.setId(1L);
-        phoneNumber.setNumber("123-456-7890");
+        phoneNumber.setNumber(null);
         User user = new User();
         user.setId(2L);
         phoneNumber.setUser(user);

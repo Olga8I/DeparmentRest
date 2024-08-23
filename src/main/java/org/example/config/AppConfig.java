@@ -68,11 +68,4 @@ public class AppConfig {
         return new JpaTransactionManager(emf);
 
     }
-    @Bean
-    public SpringLiquibase liquibase(DataSource dataSource) {
-        SpringLiquibase liquibase = new SpringLiquibase();
-        liquibase.setDataSource(dataSource);
-        liquibase.setChangeLog("classpath:db/db.changelog-master.xml");
-        return liquibase;
-    }
 }

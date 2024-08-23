@@ -14,6 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -103,10 +105,9 @@ class UserServiceTest {
 
     @Test
     void testDeleteUserSuccessfully() throws NotFoundException {
-        when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(user));
-
-        userService.delete(1L);
-        verify(userRepository, times(1)).deleteById(1L);
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        userService.delete(user.getId());
+        verify(userRepository).deleteById(1L);
     }
 
     @Test

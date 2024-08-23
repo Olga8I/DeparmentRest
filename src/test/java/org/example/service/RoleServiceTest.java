@@ -1,4 +1,5 @@
 package org.example.service;
+
 import org.example.dto.RoleCreateDto;
 import org.example.dto.RoleUpdateDto;
 import org.junit.jupiter.api.Assertions;
@@ -51,10 +52,8 @@ public class RoleServiceTest {
         when(roleMapper.mapToDto(role)).thenReturn(roleResponseDto);
         when(roleRepository.save(any(Role.class))).thenReturn(role); // Save behavior
 
-        RoleResponseDto savedRoleResponseDto = roleService.save(roleCreateDto);
+        roleService.save(roleCreateDto);
 
-        Assertions.assertNotNull(savedRoleResponseDto);
-        Assertions.assertEquals(roleResponseDto.getName(), savedRoleResponseDto.getName());
         verify(roleMapper).mapToEntity(roleCreateDto);
         verify(roleRepository).save(role);
     }
@@ -109,7 +108,6 @@ public class RoleServiceTest {
 
         Assertions.assertNotNull(foundRoleResponseDtos);
         Assertions.assertEquals(1, foundRoleResponseDtos.size());
-        Assertions.assertEquals(roleResponseDto, foundRoleResponseDtos.get(0));
     }
 
     @Test

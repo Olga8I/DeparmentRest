@@ -1,25 +1,22 @@
 package org.example.controller;
-
-import org.example.dto.DepartmentCreateDto;
-import org.example.dto.DepartmentResponseDto;
-import org.example.dto.DepartmentUpdateDto;
-import org.example.exception.NotFoundException;
-import org.example.service.DepartmentService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.example.dto.DepartmentCreateDto;
+import org.example.dto.DepartmentResponseDto;
+import org.example.dto.DepartmentUpdateDto;
+import org.example.exception.NotFoundException;
+import org.example.service.DepartmentService;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class DepartmentControllerTest {
+class DepartmentControllerTest {
 
     @InjectMocks
     private DepartmentController departmentController;
@@ -27,89 +24,85 @@ public class DepartmentControllerTest {
     @Mock
     private DepartmentService departmentService;
 
-    private DepartmentCreateDto departmentCreateDto;
-    private DepartmentResponseDto departmentResponseDto;
-
     @BeforeEach
-    public void setup() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
-        departmentCreateDto = new DepartmentCreateDto();
-        departmentCreateDto.setName("IT");
-
-        departmentResponseDto = new DepartmentResponseDto();
-        departmentResponseDto.setId(1L);
-        departmentResponseDto.setName("IT");
     }
 
     @Test
-    public void testCreateDepartment() {
-        ResponseEntity<String> response = departmentController.createDepartment(departmentCreateDto);
+    void testGetDepartmentById() throws NotFoundException {
+        DepartmentResponseDto expectedDepartment = new DepartmentResponseDto(1L, "HR", null);
 
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals("Department IT was created", response.getBody());
+        when(departmentService.findById(1L)).thenReturn(expectedDepartment);
 
-        verify(departmentService, times(1)).save(departmentCreateDto);
+        DepartmentResponseDto actualDepartment = departmentController.getDepartmentById(1L).getBody();
+        Assertions.assertNotNull(actualDepartment);
+        Assertions.assertEquals(expectedDepartment.getId(), actualDepartment.getId());
+        Assertions.assertEquals(expectedDepartment.getName(), actualDepartment.getName());
     }
 
     @Test
-    public void testGetDepartmentById_Success() throws NotFoundException {
-        when(departmentService.findById(1L)).thenReturn(departmentResponseDto);
-
-        ResponseEntity<DepartmentResponseDto> response = departmentController.getDepartmentById(1L);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(departmentResponseDto, response.getBody());
-    }
-
-    @Test
-    public void testGetDepartmentById_NotFound() throws NotFoundException {
+    void testGetDepartmentByIdNotFound() {
         when(departmentService.findById(1L)).thenThrow(new NotFoundException("Department not found"));
 
-        assertThrows(NotFoundException.class, () -> departmentController.getDepartmentById(1L));
+        Assertions.assertThrows(NotFoundException.class, () -> departmentController.getDepartmentById(1L));
     }
 
     @Test
-    public void testGetAllDepartments() {
-        List<DepartmentResponseDto> departments = Arrays.asList(departmentResponseDto);
-        when(departmentService.findAll()).thenReturn(departments);
+    void testGetAllDepartments() {
+        List<DepartmentResponseDto> expectedDepartments = new ArrayList<>();
+        expectedDepartments.add(new DepartmentResponseDto(1L, "Department", null));
+        expectedDepartments.add(new DepartmentResponseDto(1L,"Department2", null));
 
-        ResponseEntity<List<DepartmentResponseDto>> response = departmentController.getAllDepartments();
+        when(departmentService.findAll()).thenReturn(expectedDepartments);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(departments, response.getBody());
+        List<DepartmentResponseDto> actualDepartments = departmentController.getAllDepartments().getBody();
+        Assertions.assertNotNull(actualDepartments);
+        Assertions.assertEquals(2, actualDepartments.size());
     }
 
     @Test
-    public void testUpdateDepartment_Success() throws NotFoundException {
+    void testCreateDepartment() {
+        DepartmentCreateDto departmentCreateDto = new DepartmentCreateDto();
+        departmentCreateDto.setName("New Department");
+
+        doNothing().when(departmentService).save(departmentCreateDto);
+
+        String result = departmentController.createDepartment(departmentCreateDto).getBody();
+        Assertions.assertEquals("Department New Department was created", result);
+    }
+
+    @Test
+    void testUpdateDepartment() throws NotFoundException {
         DepartmentUpdateDto departmentUpdateDto = new DepartmentUpdateDto(1L, "Updated IT");
-        ResponseEntity<String> response = departmentController.updateDepartment(departmentUpdateDto);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Department id 1 was updated", response.getBody());
-        verify(departmentService, times(1)).update(departmentUpdateDto);
+        doNothing().when(departmentService).update(departmentUpdateDto);
+
+        String result = departmentController.updateDepartment(departmentUpdateDto).getBody();
+        Assertions.assertEquals("Department 1 was updated", result);
     }
 
     @Test
-    public void testUpdateDepartment_NotFound() throws NotFoundException {
+    void testUpdateDepartmentNotFound() {
         DepartmentUpdateDto departmentUpdateDto = new DepartmentUpdateDto(1L, "Updated IT");
+
         doThrow(new NotFoundException("Department not found")).when(departmentService).update(departmentUpdateDto);
 
-        assertThrows(NotFoundException.class, () -> departmentController.updateDepartment(departmentUpdateDto));
+        Assertions.assertThrows(NotFoundException.class, () -> departmentController.updateDepartment(departmentUpdateDto));
     }
 
     @Test
-    public void testDeleteDepartment_Success() throws NotFoundException {
-        ResponseEntity<String> response = departmentController.deleteDepartment(1L);
+    void testDeleteDepartment() throws NotFoundException {
+        doNothing().when(departmentService).delete(1L);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Department id 1 was deleted", response.getBody());
-        verify(departmentService, times(1)).delete(1L);
+        String result = departmentController.deleteDepartment(1L).getBody();
+        Assertions.assertEquals("Department 1 was deleted", result);
     }
 
     @Test
-    public void testDeleteDepartment_NotFound() throws NotFoundException {
+    void testDeleteDepartmentNotFound() {
         doThrow(new NotFoundException("Department not found")).when(departmentService).delete(1L);
 
-        assertThrows(NotFoundException.class, () -> departmentController.deleteDepartment(1L));
+        Assertions.assertThrows(NotFoundException.class, () -> departmentController.deleteDepartment(1L));
     }
 }

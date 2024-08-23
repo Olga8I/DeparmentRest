@@ -22,7 +22,7 @@ class DepartmentResponseDtoTest {
     void testParameterizedConstructor() {
         UserResponseDto user1 = new UserResponseDto();
         UserResponseDto user2 = new UserResponseDto();
-        DepartmentResponseDto departmentResponseDto = new DepartmentResponseDto("IT", Arrays.asList(user1, user2));
+        DepartmentResponseDto departmentResponseDto = new DepartmentResponseDto(1l,"IT", Arrays.asList(user1, user2));
 
         assertEquals("IT", departmentResponseDto.getName());
         assertEquals(2, departmentResponseDto.getUserList().size());

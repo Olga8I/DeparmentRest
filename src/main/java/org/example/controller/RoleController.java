@@ -4,16 +4,12 @@ import org.example.dto.RoleCreateDto;
 import org.example.dto.RoleResponseDto;
 import org.example.dto.RoleUpdateDto;
 import org.example.service.RoleService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/roles")
-@Validated
+@RequestMapping("/api")
 public class RoleController {
 
     private final RoleService roleService;
@@ -22,33 +18,31 @@ public class RoleController {
         this.roleService = roleService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<RoleResponseDto> getRoleById(@PathVariable Long id) {
-        RoleResponseDto roleResponseDto = roleService.findById(id);
-        return ResponseEntity.ok(roleResponseDto);
+    @GetMapping(value = "/roles/{id}")
+    public RoleResponseDto getRoleById(@PathVariable("id") Long id) {
+        return roleService.findById(id);
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<RoleResponseDto>> getAllRoles() {
-        List<RoleResponseDto> roles = roleService.findAll();
-        return ResponseEntity.ok(roles);
+    @GetMapping(value = "/roles/all")
+    public List<RoleResponseDto> getAllRoles() {
+        return roleService.findAll();
     }
 
-    @PostMapping
-    public ResponseEntity<String> createRole(@RequestBody RoleCreateDto roleCreateDto) {
-        RoleResponseDto createdRole = roleService.save(roleCreateDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Role " + createdRole.getName() + " was created");
+    @PostMapping(value = "/roles")
+    public String createRole(@RequestBody RoleCreateDto roleCreateDto) {
+        roleService.save(roleCreateDto);
+        return "Role with name " + roleCreateDto.getName() + " was created";
     }
 
-    @PutMapping
-    public ResponseEntity<String> updateRole(@RequestBody RoleUpdateDto roleUpdateDto) {
+    @PutMapping(value = "/roles")
+    public String updateRole(@RequestBody RoleUpdateDto roleUpdateDto) {
         roleService.update(roleUpdateDto);
-        return ResponseEntity.ok("Role id " + roleUpdateDto.getId() + " was updated");
+        return "Role with id " + roleUpdateDto.getId() + " was updated";
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteRole(@PathVariable Long id) {
+    @DeleteMapping("/roles/{id}")
+    public String deleteRole(@PathVariable("id") Long id) {
         roleService.delete(id);
-        return ResponseEntity.ok("Role" + id + " was deleted");
+        return "Role with id " + id + " was deleted";
     }
 }

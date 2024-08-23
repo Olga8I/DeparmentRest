@@ -7,7 +7,7 @@ import org.example.dto.RoleUpdateDto;
 import java.util.List;
 
 public interface RoleService {
-    RoleResponseDto save(RoleCreateDto role);
+    void save(RoleCreateDto role);
 
     void update(RoleUpdateDto role);
 

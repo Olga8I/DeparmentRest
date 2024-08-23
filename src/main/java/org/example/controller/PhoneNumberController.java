@@ -4,16 +4,12 @@ import org.example.dto.PhoneNumberCreateDto;
 import org.example.dto.PhoneNumberResponseDto;
 import org.example.dto.PhoneNumberUpdateDto;
 import org.example.service.PhoneNumberService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/phone_numbers")
-@Validated
+@RequestMapping("/api")
 public class PhoneNumberController {
 
     private final PhoneNumberService phoneNumberService;
@@ -22,34 +18,32 @@ public class PhoneNumberController {
         this.phoneNumberService = phoneNumberService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<PhoneNumberResponseDto> getPhoneNumberById(@PathVariable Long id) {
-        PhoneNumberResponseDto phoneNumberResponseDto = phoneNumberService.findById(id);
-        return ResponseEntity.ok(phoneNumberResponseDto);
+    @GetMapping(value = "/phone_numbers/{id}")
+    public PhoneNumberResponseDto getPhoneNumberById(@PathVariable("id") Long id) {
+        return phoneNumberService.findById(id);
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<PhoneNumberResponseDto>> getAllPhoneNumbers() {
-        List<PhoneNumberResponseDto> phoneNumbers = phoneNumberService.findAll();
-        return ResponseEntity.ok(phoneNumbers);
+    @GetMapping(value = "/phone_numbers/all")
+    public List<PhoneNumberResponseDto> getAllPhoneNumbers() {
+        return phoneNumberService.findAll();
     }
 
-    @PostMapping
-    public ResponseEntity<String> createPhoneNumber(@RequestBody PhoneNumberCreateDto phoneNumberCreateDto) {
+    @PostMapping(value = "/phone_numbers")
+    public String createPhoneNumber(@RequestBody PhoneNumberCreateDto phoneNumberCreateDto) {
         phoneNumberService.save(phoneNumberCreateDto);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Phone number " + phoneNumberCreateDto.getNumber() + " was created");
+        return "Phone number " + phoneNumberCreateDto.getNumber() + " was created";
     }
 
-    @PutMapping
-    public ResponseEntity<String> updatePhoneNumber(@RequestBody PhoneNumberUpdateDto phoneNumberUpdateDto) {
+    @PutMapping(value = "/phone_numbers")
+    public String updatePhoneNumber(@RequestBody PhoneNumberUpdateDto phoneNumberUpdateDto) {
         phoneNumberService.update(phoneNumberUpdateDto);
-        return ResponseEntity.ok("Phone number " + phoneNumberUpdateDto.getId() + " was updated");
+        return "Phone number " + phoneNumberUpdateDto.getId() + " was updated";
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePhoneNumber(@PathVariable Long id) {
+    @DeleteMapping("/phone_numbers/{id}")
+    public String deletePhoneNumber(@PathVariable("id") Long id) {
         phoneNumberService.delete(id);
-        return ResponseEntity.ok("Phone number " + id + " was deleted");
+        return "Phone number " + id + " was deleted";
     }
 }
+

@@ -17,7 +17,7 @@ public class PhoneNumber {
     private String number;
 
     @ManyToOne (fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id",  insertable = false, updatable = false)
     private User user;
 
     public PhoneNumber() {
