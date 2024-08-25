@@ -14,4 +14,5 @@ public interface RoleMapper {
     RoleResponseDto mapToDto(Role role);
 
     List<RoleUpdateDto> mapToListToDto(List<Role> roleList);
+
 }

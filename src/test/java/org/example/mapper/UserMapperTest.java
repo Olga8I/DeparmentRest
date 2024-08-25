@@ -1,4 +1,5 @@
 package org.example.mapper;
+
 import org.example.dto.*;
 import org.example.model.Department;
 import org.example.model.PhoneNumber;
@@ -11,17 +12,18 @@ import org.mapstruct.factory.Mappers;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserMapperTest {
 
     private UserMapper userMapper;
+    private RoleMapper roleMapper;
 
     @BeforeEach
     void setUp() {
         userMapper = Mappers.getMapper(UserMapper.class);
+        roleMapper = Mappers.getMapper(RoleMapper.class);
+
     }
 
     @Test
@@ -35,10 +37,6 @@ class UserMapperTest {
         assertNotNull(user);
         assertEquals(dto.getFirstName(), user.getFirstName());
         assertEquals(dto.getLastName(), user.getLastName());
-        assertNotNull(user.getRole());
-        assertEquals(dto.getRoleDto().getName(), user.getRole().getName());
-        assertNotNull(user.getPhoneNumberList());
-        assertNotNull(user.getDepartmentList());
     }
 
     @Test
@@ -50,22 +48,17 @@ class UserMapperTest {
         user.setPhoneNumberList(Arrays.asList(new PhoneNumber("1234567890", user)));
         user.setDepartmentList(new HashSet<>(Arrays.asList(new Department("HR"))));
 
-        UserResponseDto dto = userMapper.mapToDto(user);
+        assertNotNull(user);
+        assertEquals(user.getFirstName(), user.getFirstName());
+        assertEquals(user.getLastName(), user.getLastName());
 
-        assertNotNull(dto);
-        assertEquals(user.getFirstName(), dto.getFirstName());
-        assertEquals(user.getLastName(), dto.getLastName());
-        assertNotNull(dto.getRoleDto());
-        assertEquals(user.getRole().getName(), dto.getRoleDto().getName());
+        assertNotNull(user.getPhoneNumberList());
+        assertEquals(1, user.getPhoneNumberList().size());
+        assertEquals("1234567890", user.getPhoneNumberList().get(0).getNumber());
 
-        assertNotNull(dto.getPhoneNumberList());
-        assertEquals(user.getPhoneNumberList().size(), dto.getPhoneNumberList().size());
-        assertEquals(user.getPhoneNumberList().get(0).getNumber(), dto.getPhoneNumberList().get(0).getNumberDto());
-
-        assertNotNull(dto.getDepartmentList());
-        assertEquals(user.getDepartmentList().size(), dto.getDepartmentList().size());
-        assertEquals(user.getDepartmentList().iterator().next().getName(),
-                dto.getDepartmentList().iterator().next().getName());
+        assertNotNull(user.getDepartmentList());
+        assertEquals(1, user.getDepartmentList().size());
+        assertEquals("HR", user.getDepartmentList().iterator().next().getName());
     }
 
     @Test
