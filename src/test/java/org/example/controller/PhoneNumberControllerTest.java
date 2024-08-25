@@ -1,115 +1,86 @@
 package org.example.controller;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.controller.PhoneNumberController;
-import org.example.dto.PhoneNumberDto;
+import org.example.dto.PhoneNumberCreateDto;
+import org.example.dto.PhoneNumberResponseDto;
+import org.example.dto.PhoneNumberUpdateDto;
 import org.example.service.PhoneNumberService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-public class PhoneNumberControllerTest {
-
-    private MockMvc mockMvc;
-
-    @Mock
-    private PhoneNumberService phoneNumberService;
+class PhoneNumberControllerTest {
 
     @InjectMocks
     private PhoneNumberController phoneNumberController;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Mock
+    private PhoneNumberService phoneNumberService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(phoneNumberController).build();
     }
 
     @Test
-    public void testCreatePhoneNumber() throws Exception {
-        PhoneNumberDto phoneNumberDto = new PhoneNumberDto("123456789", null);
+    void testGetPhoneNumberById() {
+        PhoneNumberResponseDto phoneNumberResponseDto = new PhoneNumberResponseDto("123456789", null);
+        phoneNumberResponseDto.setId(1L);
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/api/phoneNumbers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(phoneNumberDto)))
-                .andReturn();
+        when(phoneNumberService.findById(1L)).thenReturn(phoneNumberResponseDto);
 
-        assertEquals(HttpStatus.CREATED.value(), mvcResult.getResponse().getStatus());
-        verify(phoneNumberService, times(1)).save(any(PhoneNumberDto.class));
+        PhoneNumberResponseDto phoneNumber = phoneNumberController.getPhoneNumberById(1L);
+        Assertions.assertNotNull(phoneNumber);
+        Assertions.assertEquals(phoneNumberResponseDto.getId(), phoneNumber.getId());
+        Assertions.assertEquals(phoneNumberResponseDto.getNumberDto(), phoneNumber.getNumberDto());
     }
 
     @Test
-    public void testUpdatePhoneNumber() throws Exception {
-        PhoneNumberDto phoneNumberDto = new PhoneNumberDto("987654321", null);
-        phoneNumberDto.setId(1L);
-                MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
-                        .put("/api/phoneNumbers/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(phoneNumberDto)))
-                .andReturn();
+    void testGetAllPhoneNumbers() {
+        List<PhoneNumberResponseDto> phoneNumbers = new ArrayList<>();
+        phoneNumbers.add(new PhoneNumberResponseDto("123456789", null));
+        phoneNumbers.add(new PhoneNumberResponseDto("987654321", null));
 
-        assertEquals(HttpStatus.OK.value(), mvcResult.getResponse().getStatus());
-        verify(phoneNumberService, times(1)).update(any(PhoneNumberDto.class));
+        when(phoneNumberService.findAll()).thenReturn(phoneNumbers);
+
+        List<PhoneNumberResponseDto> responseDtoList = phoneNumberController.getAllPhoneNumbers();
+        Assertions.assertNotNull(responseDtoList);
+        Assertions.assertEquals(2, responseDtoList.size());
     }
 
     @Test
-    public void testGetPhoneNumberById() throws Exception {
-        PhoneNumberDto phoneNumberDto = new PhoneNumberDto("123456789", null);
-        phoneNumberDto.setId(1L);
+    void testCreatePhoneNumber() {
+        PhoneNumberCreateDto phoneNumberCreateDto = new PhoneNumberCreateDto("123456789");
 
-        when(phoneNumberService.findById(1L)).thenReturn(phoneNumberDto);
+        String result = phoneNumberController.createPhoneNumber(phoneNumberCreateDto);
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
-                        .get("/api/phoneNumbers/{id}", 1L))
-                .andReturn();
-
-        assertEquals(HttpStatus.OK.value(), mvcResult.getResponse().getStatus());
-        assertEquals(objectMapper.writeValueAsString(phoneNumberDto), mvcResult.getResponse().getContentAsString());
+        Assertions.assertEquals("Phone number 123456789 was created", result);
+        verify(phoneNumberService, times(1)).save(phoneNumberCreateDto);
     }
 
     @Test
-    public void testGetAllPhoneNumbers() throws Exception {
-        PhoneNumberDto phoneNumberDto1 = new PhoneNumberDto("123456789", null);
-        PhoneNumberDto phoneNumberDto2 = new PhoneNumberDto("987654321", null);
-        List<PhoneNumberDto> phoneNumberDtos = List.of(phoneNumberDto1, phoneNumberDto2);
+    void testUpdatePhoneNumber() {
+        PhoneNumberUpdateDto phoneNumberUpdateDto = new PhoneNumberUpdateDto(1L, "987654321");
 
-        when(phoneNumberService.findAll()).thenReturn(phoneNumberDtos);
+        String result = phoneNumberController.updatePhoneNumber(phoneNumberUpdateDto);
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
-                        .get("/api/phoneNumbers"))
-                .andReturn();
-
-        assertEquals(HttpStatus.OK.value(), mvcResult.getResponse().getStatus());
-        assertEquals(objectMapper.writeValueAsString(phoneNumberDtos), mvcResult.getResponse().getContentAsString());
+        Assertions.assertEquals("Phone number 1 was updated", result);
+        verify(phoneNumberService, times(1)).update(phoneNumberUpdateDto);
     }
 
     @Test
-    public void testDeletePhoneNumber() throws Exception {
-        doNothing().when(phoneNumberService).delete(1L);
+    void testDeletePhoneNumber() {
+        Long phoneNumberId = 1L;
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
-                        .delete("/api/phoneNumbers/{id}", 1L))
-                .andReturn();
+        String result = phoneNumberController.deletePhoneNumber(phoneNumberId);
 
-        assertEquals(HttpStatus.NO_CONTENT.value(), mvcResult.getResponse().getStatus());
-        verify(phoneNumberService, times(1)).delete(1L);
+        Assertions.assertEquals("Phone number 1 was deleted", result);
+        verify(phoneNumberService, times(1)).delete(phoneNumberId);
     }
 }
-

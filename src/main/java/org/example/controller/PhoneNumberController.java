@@ -1,62 +1,49 @@
 package org.example.controller;
 
-import org.example.dto.PhoneNumberDto;
-import org.example.exception.NotFoundException;
+import org.example.dto.PhoneNumberCreateDto;
+import org.example.dto.PhoneNumberResponseDto;
+import org.example.dto.PhoneNumberUpdateDto;
 import org.example.service.PhoneNumberService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/phoneNumbers")
+@RequestMapping("/api")
 public class PhoneNumberController {
 
     private final PhoneNumberService phoneNumberService;
 
-    @Autowired
     public PhoneNumberController(PhoneNumberService phoneNumberService) {
         this.phoneNumberService = phoneNumberService;
     }
 
-    @PostMapping
-    public ResponseEntity<PhoneNumberDto> create(@RequestBody PhoneNumberDto phoneNumberDto) {
-        phoneNumberService.save(phoneNumberDto);
-        return new ResponseEntity<>(phoneNumberDto, HttpStatus.CREATED);
+    @GetMapping(value = "/phone_numbers/{id}")
+    public PhoneNumberResponseDto getPhoneNumberById(@PathVariable("id") Long id) {
+        return phoneNumberService.findById(id);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<PhoneNumberDto> update(@PathVariable Long id, @RequestBody PhoneNumberDto phoneNumberDto) {
-        phoneNumberDto.setId(id);
-        try {
-            phoneNumberService.update(phoneNumberDto);
-            return new ResponseEntity<>(phoneNumberDto, HttpStatus.OK);
-        } catch (NotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    @GetMapping(value = "/phone_numbers/all")
+    public List<PhoneNumberResponseDto> getAllPhoneNumbers() {
+        return phoneNumberService.findAll();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<PhoneNumberDto> getById(@PathVariable Long id) {
-        try {
-            PhoneNumberDto phoneNumberDto = phoneNumberService.findById(id);
-            return new ResponseEntity<>(phoneNumberDto, HttpStatus.OK);
-        } catch (NotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    @PostMapping(value = "/phone_numbers")
+    public String createPhoneNumber(@RequestBody PhoneNumberCreateDto phoneNumberCreateDto) {
+        phoneNumberService.save(phoneNumberCreateDto);
+        return "Phone number " + phoneNumberCreateDto.getNumber() + " was created";
     }
 
-    @GetMapping
-    public ResponseEntity<List<PhoneNumberDto>> getAll() {
-        List<PhoneNumberDto> phoneNumbers = phoneNumberService.findAll();
-        return new ResponseEntity<>(phoneNumbers, HttpStatus.OK);
+    @PutMapping(value = "/phone_numbers")
+    public String updatePhoneNumber(@RequestBody PhoneNumberUpdateDto phoneNumberUpdateDto) {
+        phoneNumberService.update(phoneNumberUpdateDto);
+        return "Phone number " + phoneNumberUpdateDto.getId() + " was updated";
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    @DeleteMapping("/phone_numbers/{id}")
+    public String deletePhoneNumber(@PathVariable("id") Long id) {
         phoneNumberService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return "Phone number " + id + " was deleted";
     }
 }
+

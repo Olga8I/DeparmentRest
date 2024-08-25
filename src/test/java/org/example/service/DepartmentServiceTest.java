@@ -3,14 +3,15 @@ package org.example.service;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-import jakarta.persistence.EntityNotFoundException;
-import org.example.dto.DepartmentDto;
+import org.example.dto.DepartmentCreateDto;
+import org.example.dto.DepartmentResponseDto;
+import org.example.dto.DepartmentUpdateDto;
 import org.example.exception.NotFoundException;
 import org.example.mapper.DepartmentMapper;
 import org.example.model.Department;
-import org.example.repository.UserRepository;
-import org.example.repository.dao.DepartmentRepositoryDao;
+import org.example.repository.DepartmentRepository;
 import org.example.service.impl.DepartmentServiceImpl;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -25,10 +27,7 @@ import java.util.Optional;
 public class DepartmentServiceTest {
 
     @Mock
-    private DepartmentRepositoryDao departmentRepositoryDao;
-
-    @Mock
-    private UserRepository userRepository;
+    private DepartmentRepository departmentRepository;
 
     @Mock
     private DepartmentMapper departmentMapper;
@@ -36,39 +35,40 @@ public class DepartmentServiceTest {
     @InjectMocks
     private DepartmentServiceImpl departmentService;
 
-    private DepartmentDto departmentDto;
+    private DepartmentCreateDto departmentCreateDto;
+    private DepartmentUpdateDto departmentUpdateDto;
+    private DepartmentResponseDto departmentResponseDto;
     private Department department;
 
     @BeforeEach
     public void setUp() {
-        departmentDto = new DepartmentDto();
-        departmentDto.setId(1L);
-        departmentDto.setName("HR");
+        departmentCreateDto = new DepartmentCreateDto("HR");
+        departmentUpdateDto = new DepartmentUpdateDto(1L, "HR");
+        departmentResponseDto = new DepartmentResponseDto(1L, "HR",null);
 
-        department = new Department();
+        department = new Department("HR");
         department.setId(1L);
-        department.setName("HR");
-
     }
 
     @Test
     public void testSaveDepartment() {
-        departmentService.save(departmentDto);
-        verify(departmentRepositoryDao).add(department);
+        when(departmentMapper.mapToEntity(departmentCreateDto)).thenReturn(department);
+        departmentService.save(departmentCreateDto);
+        verify(departmentRepository).save(department);
     }
 
     @Test
     public void testUpdateDepartment() throws NotFoundException {
-        when(departmentRepositoryDao.existsById(departmentDto.getId())).thenReturn(true);
-        departmentService.update(departmentDto);
-        verify(departmentRepositoryDao).update(department);
+        when(departmentRepository.findById(departmentUpdateDto.getId())).thenReturn(Optional.of(department));
+        departmentService.update(departmentUpdateDto);
+        verify(departmentRepository).save(department);
     }
 
     @Test
     public void testUpdateDepartmentThrowsNotFoundException() {
-        when(departmentRepositoryDao.existsById(departmentDto.getId())).thenReturn(false);
+        when(departmentRepository.findById(departmentUpdateDto.getId())).thenReturn(Optional.empty());
         NotFoundException thrown = assertThrows(NotFoundException.class, () -> {
-            departmentService.update(departmentDto);
+            departmentService.update(departmentUpdateDto);
         });
 
         org.junit.jupiter.api.Assertions.assertEquals("Department not found.", thrown.getMessage());
@@ -76,17 +76,18 @@ public class DepartmentServiceTest {
 
     @Test
     public void testFindById() throws NotFoundException {
-        when(departmentRepositoryDao.findById(departmentDto.getId())).thenReturn(Optional.of(department));
-        DepartmentDto foundDepartment = departmentService.findById(departmentDto.getId());
-        verify(departmentRepositoryDao).findById(departmentDto.getId());
-        org.junit.jupiter.api.Assertions.assertEquals(departmentDto, foundDepartment);
+        when(departmentRepository.findById(department.getId())).thenReturn(Optional.of(department));
+        when(departmentMapper.mapToDto(department)).thenReturn(departmentResponseDto);
+        DepartmentResponseDto foundDepartment = departmentService.findById(department.getId());
+        verify(departmentRepository).findById(department.getId());
+        Assertions.assertEquals(department.getName(), foundDepartment.getName());
     }
 
     @Test
     public void testFindByIdThrowsNotFoundException() {
-        when(departmentRepositoryDao.findById(departmentDto.getId())).thenReturn(Optional.empty());
+        when(departmentRepository.findById(department.getId())).thenReturn(Optional.empty());
         NotFoundException thrown = assertThrows(NotFoundException.class, () -> {
-            departmentService.findById(departmentDto.getId());
+            departmentService.findById(department.getId());
         });
 
         org.junit.jupiter.api.Assertions.assertEquals("Department not found.", thrown.getMessage());
@@ -94,25 +95,25 @@ public class DepartmentServiceTest {
 
     @Test
     public void testFindAll() {
-        when(departmentRepositoryDao.findAll()).thenReturn(Collections.singletonList(department));
+        when(departmentRepository.findAll()).thenReturn(Collections.singletonList(department));
 
         departmentService.findAll();
 
-        verify(departmentRepositoryDao).findAll();
+        verify(departmentRepository).findAll();
     }
 
     @Test
     public void testDelete() throws NotFoundException {
-        when(departmentRepositoryDao.existsById(departmentDto.getId())).thenReturn(true);
-        departmentService.delete(departmentDto.getId());
-        verify(departmentRepositoryDao).delete(departmentDto.getId());
+        when(departmentRepository.existsById(department.getId())).thenReturn(true);
+        departmentService.delete(department.getId());
+        verify(departmentRepository).deleteById(department.getId());
     }
 
     @Test
     public void testDeleteThrowsNotFoundException() {
-        when(departmentRepositoryDao.existsById(departmentDto.getId())).thenReturn(false);
-        assertThrows(EntityNotFoundException.class, () -> {
-            departmentService.delete(departmentDto.getId());
+        when(departmentRepository.existsById(department.getId())).thenReturn(false);
+        assertThrows(NotFoundException.class, () -> {
+            departmentService.delete(department.getId());
         });
     }
 }

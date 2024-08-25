@@ -7,15 +7,17 @@ import jakarta.persistence.*;
  * Many To One: PhoneNumber - User
  */
 @Entity
+@Table(name = "phone_numbers")
 public class PhoneNumber {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column (name = "user_id")
     private Long id;
-
+    @Column (name = "phonenumber_number")
     private String number;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @ManyToOne (fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id",  insertable = false, updatable = false)
     private User user;
 
     public PhoneNumber() {

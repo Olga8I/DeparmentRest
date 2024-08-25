@@ -1,10 +1,12 @@
 package org.example.service.impl;
 
-import org.example.dto.PhoneNumberDto;
+import org.example.dto.PhoneNumberCreateDto;
+import org.example.dto.PhoneNumberResponseDto;
+import org.example.dto.PhoneNumberUpdateDto;
 import org.example.exception.NotFoundException;
 import org.example.model.PhoneNumber;
 import org.example.mapper.PhoneNumberMapper;
-import org.example.repository.dao.PhoneNumberRepositoryDao;
+import org.example.repository.PhoneNumberRepository;
 import org.example.service.PhoneNumberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,44 +17,44 @@ import java.util.List;
 public class PhoneNumberServiceImpl implements PhoneNumberService {
 
     private final PhoneNumberMapper phoneNumberMapper;
-    private final PhoneNumberRepositoryDao phoneNumberRepositoryDao;
+    private final PhoneNumberRepository phoneNumberRepository;
 
     @Autowired
-    public PhoneNumberServiceImpl(PhoneNumberMapper phoneNumberMapper, PhoneNumberRepositoryDao phoneNumberRepositoryDao) {
+    public PhoneNumberServiceImpl(PhoneNumberMapper phoneNumberMapper, PhoneNumberRepository phoneNumberRepository) {
         this.phoneNumberMapper = phoneNumberMapper;
-        this.phoneNumberRepositoryDao = phoneNumberRepositoryDao;
+        this.phoneNumberRepository = phoneNumberRepository;
     }
 
     @Override
-    public void save(PhoneNumberDto phoneNumberDto) {
-        PhoneNumber phoneNumber = phoneNumberMapper.mapToEntity(phoneNumberDto);
+    public void save(PhoneNumberCreateDto phoneNumberCreateDto) {
+        PhoneNumber phoneNumber = phoneNumberMapper.mapToEntity(phoneNumberCreateDto);
+        phoneNumberRepository.save(phoneNumber);
     }
 
     @Override
-    public void update(PhoneNumberDto phoneNumberDto) throws NotFoundException {
-        if (phoneNumberRepositoryDao.existsById(phoneNumberDto.getId())) {
-            PhoneNumber phoneNumber = phoneNumberMapper.mapToEntity(phoneNumberDto);
-            phoneNumberRepositoryDao.add(phoneNumber);
-        } else {
-            throw new NotFoundException("PhoneNumber not found.");
-        }
+    public void update(PhoneNumberUpdateDto phoneNumberUpdateDto) {
+        PhoneNumber phoneNumber = phoneNumberRepository.findById(phoneNumberUpdateDto.getId()).orElseThrow(
+                () -> new NotFoundException("Phone number not found.")
+        );
+        phoneNumber.setNumber(phoneNumberUpdateDto.getNumber());
+        phoneNumberRepository.save(phoneNumber);
     }
     @Override
-    public PhoneNumberDto findById(Long phoneNumberId) throws NotFoundException {
-        PhoneNumber phoneNumber = phoneNumberRepositoryDao.findById(phoneNumberId)
-                .orElseThrow(() -> new NotFoundException("Department not found."));
+    public PhoneNumberResponseDto findById(Long phoneNumberId) throws NotFoundException {
+        PhoneNumber phoneNumber = phoneNumberRepository.findById(phoneNumberId)
+                .orElseThrow(() -> new NotFoundException("Phone number not found."));
         return phoneNumberMapper.mapToDto(phoneNumber);
     }
 
     @Override
-    public List<PhoneNumberDto> findAll() {
-        List<PhoneNumber> phoneNumberList = phoneNumberRepositoryDao.findAll();
-        return phoneNumberMapper.mapToListToDto(phoneNumberList);
+    public List<PhoneNumberResponseDto> findAll() {
+
+        return phoneNumberRepository.findAll().stream().map(phoneNumberMapper::mapToDto).toList();
     }
 
     @Override
     public void delete(Long phoneNumberId) {
-        phoneNumberRepositoryDao.delete(phoneNumberId);
+        phoneNumberRepository.deleteById(phoneNumberId);
     }
 }
 

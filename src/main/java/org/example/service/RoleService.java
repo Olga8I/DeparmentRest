@@ -1,18 +1,19 @@
 package org.example.service;
 
-import org.example.dto.RoleDto;
-import org.example.exception.NotFoundException;
+import org.example.dto.RoleCreateDto;
+import org.example.dto.RoleResponseDto;
+import org.example.dto.RoleUpdateDto;
 
 import java.util.List;
 
 public interface RoleService {
-    RoleDto save(RoleDto role);
+    void save(RoleCreateDto role);
 
-    void update(RoleDto role) throws NotFoundException;
+    void update(RoleUpdateDto role);
 
-    RoleDto findById(Long roleId) throws NotFoundException;
+    RoleResponseDto findById(Long roleId);
 
-    List<RoleDto> findAll();
+    List<RoleResponseDto> findAll();
 
-    void delete(Long roleId) throws NotFoundException;
+    void delete(Long roleId);
 }

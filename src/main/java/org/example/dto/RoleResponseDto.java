@@ -2,14 +2,14 @@ package org.example.dto;
 
 import java.util.Objects;
 
-public class RoleDto {
+public class RoleResponseDto {
     private Long id;
     private String name;
 
-    public RoleDto() {
+    public RoleResponseDto() {
     }
 
-    public RoleDto(String name) {
+    public RoleResponseDto(String name) {
         this.name = name;
 
     }
@@ -25,8 +25,9 @@ public class RoleDto {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof RoleDto roleDto)) return false;
-        return Objects.equals(id, roleDto.id) && Objects.equals(name, roleDto.name);
+        if (o == null || getClass() != o.getClass()) return false;
+        RoleResponseDto that = (RoleResponseDto) o;
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name);
     }
 
     @Override
@@ -36,7 +37,7 @@ public class RoleDto {
 
     @Override
     public String toString() {
-        return "RoleDto{" +
+        return "RoleResponseDto{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';

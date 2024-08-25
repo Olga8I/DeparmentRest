@@ -1,6 +1,7 @@
 package org.example.mapper;
-
-import org.example.mapper.RoleMapper;
+import org.example.dto.RoleCreateDto;
+import org.example.dto.RoleResponseDto;
+import org.example.dto.RoleUpdateDto;
 import org.example.model.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,22 +23,22 @@ class RoleMapperTest {
 
     @Test
     void testMapToEntity() {
-        org.example.dto.RoleDto dto = new org.example.dto.RoleDto();
+        RoleCreateDto dto = new RoleCreateDto();
         dto.setName("Admin");
 
         Role role = roleMapper.mapToEntity(dto);
 
         assertNotNull(role);
-        assertEquals(dto.getId(), role.getId());
         assertEquals(dto.getName(), role.getName());
     }
 
     @Test
     void testMapToDTO() {
         Role role = new Role();
+        role.setId(1L);
         role.setName("Admin");
 
-        org.example.dto.RoleDto dto = roleMapper.mapToDto(role);
+        RoleResponseDto dto = roleMapper.mapToDto(role);
 
         assertNotNull(dto);
         assertEquals(role.getId(), dto.getId());
@@ -47,23 +48,25 @@ class RoleMapperTest {
     @Test
     void testMapToDTOList() {
         Role role1 = new Role();
+        role1.setId(1L);
         role1.setName("Admin");
 
         Role role2 = new Role();
+        role2.setId(2L);
         role2.setName("User");
 
         List<Role> roles = Arrays.asList(role1, role2);
 
-        List<org.example.dto.RoleDto> dtoList = roleMapper.mapToListToDto(roles);
+        List<RoleUpdateDto> dtoList = roleMapper.mapToListToDto(roles);
 
         assertNotNull(dtoList);
         assertEquals(2, dtoList.size());
 
-        org.example.dto.RoleDto dto1 = dtoList.get(0);
+        RoleUpdateDto dto1 = dtoList.get(0);
         assertEquals(role1.getId(), dto1.getId());
         assertEquals(role1.getName(), dto1.getName());
 
-        org.example.dto.RoleDto dto2 = dtoList.get(1);
+        RoleUpdateDto dto2 = dtoList.get(1);
         assertEquals(role2.getId(), dto2.getId());
         assertEquals(role2.getName(), dto2.getName());
     }

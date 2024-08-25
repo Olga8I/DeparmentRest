@@ -13,13 +13,17 @@ import java.util.Set;
  */
 
 @Entity
+@Table(name = "departments")
 public class Department {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column (name = "department_id")
     private Long id;
+    @Column (name = "department_name")
     private String name;
-    @ManyToMany
-    @JoinTable(name = "user_department", joinColumns = @JoinColumn (name = "department_id"), inverseJoinColumns = @JoinColumn (name = "user_id"))
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_department", joinColumns = @JoinColumn (name = "department_id"),
+            inverseJoinColumns = @JoinColumn (name = "user_id"))
     private Set<User> userList;
 
     public Department(){

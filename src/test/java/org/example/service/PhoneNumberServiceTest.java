@@ -1,13 +1,15 @@
 package org.example.service;
+
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import org.example.dto.PhoneNumberDto;
+import org.example.dto.PhoneNumberCreateDto;
+import org.example.dto.PhoneNumberResponseDto;
+import org.example.dto.PhoneNumberUpdateDto;
 import org.example.exception.NotFoundException;
 import org.example.mapper.PhoneNumberMapper;
 import org.example.model.PhoneNumber;
-import org.example.repository.dao.PhoneNumberRepositoryDao;
+import org.example.repository.PhoneNumberRepository;
 import org.example.service.impl.PhoneNumberServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,17 +30,24 @@ public class PhoneNumberServiceTest {
     private PhoneNumberMapper phoneNumberMapper;
 
     @Mock
-    private PhoneNumberRepositoryDao phoneNumberRepositoryDao;
+    private PhoneNumberRepository phoneNumberRepository;
 
-    private PhoneNumberDto phoneNumberDto;
+    private PhoneNumberCreateDto phoneNumberCreateDto;
+    private PhoneNumberUpdateDto phoneNumberUpdateDto;
+    private PhoneNumberResponseDto phoneNumberResponseDto;
     private PhoneNumber phoneNumber;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        phoneNumberDto = new PhoneNumberDto();
-        phoneNumberDto.setId(1L);
-        phoneNumberDto.setNumberDto("123456789");
+
+        phoneNumberCreateDto = new PhoneNumberCreateDto("123456789");
+
+        phoneNumberUpdateDto = new PhoneNumberUpdateDto(1L, "987654321");
+
+        phoneNumberResponseDto = new PhoneNumberResponseDto();
+        phoneNumberResponseDto.setId(1L);
+        phoneNumberResponseDto.setNumberDto("123456789");
 
         phoneNumber = new PhoneNumber();
         phoneNumber.setId(1L);
@@ -47,62 +56,70 @@ public class PhoneNumberServiceTest {
 
     @Test
     public void testUpdateSuccess() throws NotFoundException {
-        when(phoneNumberRepositoryDao.existsById(phoneNumberDto.getId())).thenReturn(true);
-        when(phoneNumberMapper.mapToEntity(phoneNumberDto)).thenReturn(phoneNumber);
+        when(phoneNumberRepository.findById(phoneNumberUpdateDto.getId())).thenReturn(Optional.of(phoneNumber));
+        when(phoneNumberMapper.mapToEntity(phoneNumberCreateDto)).thenReturn(phoneNumber);
 
-        phoneNumberService.update(phoneNumberDto);
+        phoneNumberService.update(phoneNumberUpdateDto);
 
-        verify(phoneNumberRepositoryDao).add(phoneNumber);
+        verify(phoneNumberRepository).save(phoneNumber);
     }
 
     @Test
     public void testUpdateNotFound() {
-        when(phoneNumberRepositoryDao.existsById(phoneNumberDto.getId())).thenReturn(false);
+        when(phoneNumberRepository.findById(phoneNumberUpdateDto.getId())).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(NotFoundException.class, () -> {
-            phoneNumberService.update(phoneNumberDto);
+            phoneNumberService.update(phoneNumberUpdateDto);
         });
 
-        assertEquals("PhoneNumber not found.", exception.getMessage());
+        assertEquals("Phone number not found.", exception.getMessage());
     }
 
     @Test
     public void testFindByIdSuccess() throws NotFoundException {
-        when(phoneNumberRepositoryDao.findById(phoneNumberDto.getId())).thenReturn(Optional.of(phoneNumber));
-        when(phoneNumberMapper.mapToDto(phoneNumber)).thenReturn(phoneNumberDto);
+        when(phoneNumberRepository.findById(phoneNumberResponseDto.getId())).thenReturn(Optional.of(phoneNumber));
+        when(phoneNumberMapper.mapToDto(phoneNumber)).thenReturn(phoneNumberResponseDto);
 
-        PhoneNumberDto foundPhoneNumberDto = phoneNumberService.findById(phoneNumberDto.getId());
+        PhoneNumberResponseDto foundPhoneNumberResponseDto = phoneNumberService.findById(phoneNumberResponseDto.getId());
 
-        assertEquals(phoneNumberDto, foundPhoneNumberDto);
+        assertEquals(phoneNumberResponseDto, foundPhoneNumberResponseDto);
     }
 
     @Test
     public void testFindByIdNotFound() {
-        when(phoneNumberRepositoryDao.findById(phoneNumberDto.getId())).thenReturn(Optional.empty());
+        when(phoneNumberRepository.findById(phoneNumberResponseDto.getId())).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(NotFoundException.class, () -> {
-            phoneNumberService.findById(phoneNumberDto.getId());
+            phoneNumberService.findById(phoneNumberResponseDto.getId());
         });
 
-        assertEquals("Department not found.", exception.getMessage());
+        assertEquals("Phone number not found.", exception.getMessage());
     }
 
     @Test
     public void testFindAll() {
         List<PhoneNumber> phoneNumbers = new ArrayList<>();
         phoneNumbers.add(phoneNumber);
-        when(phoneNumberRepositoryDao.findAll()).thenReturn(phoneNumbers);
-        when(phoneNumberMapper.mapToListToDto(phoneNumbers)).thenReturn(List.of(phoneNumberDto));
+        when(phoneNumberRepository.findAll()).thenReturn(phoneNumbers);
+        when(phoneNumberMapper.mapToDto(phoneNumber)).thenReturn(phoneNumberResponseDto);
 
-        List<PhoneNumberDto> result = phoneNumberService.findAll();
+        List<PhoneNumberResponseDto> result = phoneNumberService.findAll();
 
         assertEquals(1, result.size());
-        assertEquals(phoneNumberDto, result.get(0));
+        assertEquals(phoneNumberResponseDto, result.get(0));
     }
 
     @Test
     public void testDelete() {
-        phoneNumberService.delete(phoneNumberDto.getId());
-        verify(phoneNumberRepositoryDao).delete(phoneNumberDto.getId());
+        doNothing().when(phoneNumberRepository).deleteById(phoneNumberResponseDto.getId());
+        phoneNumberService.delete(phoneNumberResponseDto.getId());
+        verify(phoneNumberRepository).deleteById(phoneNumberResponseDto.getId());
+    }
+
+    @Test
+    public void testSave() {
+        when(phoneNumberMapper.mapToEntity(phoneNumberCreateDto)).thenReturn(phoneNumber);
+        phoneNumberService.save(phoneNumberCreateDto);
+        verify(phoneNumberRepository).save(phoneNumber);
     }
 }

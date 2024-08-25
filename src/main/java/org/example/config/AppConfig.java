@@ -1,75 +1,71 @@
 package org.example.config;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import jakarta.persistence.EntityManagerFactory;
 import liquibase.integration.spring.SpringLiquibase;
-import org.apache.commons.dbcp2.BasicDataSource;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.util.ResourceUtils;
 
 import javax.sql.DataSource;
-import java.util.Properties;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.stream.Collectors;
 
+@EnableJpaRepositories("org.example.repository")
+@EnableTransactionManagement
 @Configuration
 @ComponentScan(basePackages = "org.example")
 @PropertySource("classpath:database.properties")
 public class AppConfig {
 
-    @Value("${db.driver-class-name}")
-    private String driverClassName;
+    private final Environment env;
 
-    @Value("${db.url}")
-    private String url;
+    public AppConfig(Environment env) {
+        this.env = env;
+    }
 
-    @Value("${db.username}")
-    private String username;
-
-    @Value("${db.password}")
-    private String password;
+    private String loadSql(String path) {
+        String schemeSql;
+        try (BufferedReader br = new BufferedReader(new FileReader(ResourceUtils.getFile(path).getAbsolutePath()))) {
+            schemeSql = br.lines().collect(Collectors.joining());
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not load sql script", e);
+        }
+        return schemeSql;
+    }
 
     @Bean
     public DataSource dataSource() {
-        BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setDriverClassName(driverClassName);
-        dataSource.setUrl(url);
-        dataSource.setUsername(username);
-        dataSource.setPassword(password);
-        return dataSource;
+        var config = new HikariConfig();
+        config.setDriverClassName(env.getProperty("db.driver"));
+        config.setJdbcUrl(env.getProperty("db.url"));
+        config.setUsername(env.getProperty("db.username"));
+        config.setPassword(env.getProperty("db.password"));
+        config.setConnectionInitSql(loadSql("classpath:schema.sql"));
+        return new HikariDataSource(config);
     }
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
-        LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
+        var emf = new LocalContainerEntityManagerFactoryBean();
         emf.setDataSource(dataSource);
         emf.setPackagesToScan("org.example.model");
         emf.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-
-        Properties properties = new Properties();
-        properties.setProperty("hibernate.show_sql", "true");
-        properties.setProperty("hibernate.format_sql", "true");
-        properties.setProperty("hibernate.hbm2ddl.auto", "none");
-        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
-        emf.setJpaProperties(properties);
-
         return emf;
     }
 
     @Bean
-    public SpringLiquibase liquibase(DataSource dataSource) {
-        SpringLiquibase liquibase = new SpringLiquibase();
-        liquibase.setDataSource(dataSource);
-        liquibase.setChangeLog("classpath:db/db.changelog-master.xml");
-        return liquibase;
+    public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
+        return new JpaTransactionManager(emf);
+
     }
-
-
-
-    @Bean
-    public JpaTransactionManager transactionManager() {
-        JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(entityManagerFactory(dataSource()).getObject());
-        return transactionManager;
-    }
-
 }

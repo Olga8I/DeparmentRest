@@ -1,10 +1,12 @@
 package org.example.service.impl;
 
-import org.example.dto.RoleDto;
+import org.example.dto.RoleCreateDto;
+import org.example.dto.RoleResponseDto;
+import org.example.dto.RoleUpdateDto;
 import org.example.exception.NotFoundException;
 import org.example.mapper.RoleMapper;
 import org.example.model.Role;
-import org.example.repository.dao.RoleRepositoryDao;
+import org.example.repository.RoleRepository;
 import org.example.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,49 +16,55 @@ import java.util.List;
 @Service
 public class RoleServiceImpl implements RoleService {
 
-    private RoleRepositoryDao roleRepositoryDao;
+    private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
 
     @Autowired
-    public RoleServiceImpl(RoleMapper roleMapper) {
+    public RoleServiceImpl(RoleRepository roleRepository, RoleMapper roleMapper) {
+        this.roleRepository = roleRepository;
         this.roleMapper = roleMapper;
     }
 
     @Override
-    public RoleDto save(RoleDto roleDto) {
-        Role role = roleMapper.mapToEntity(roleDto);
-        return roleMapper.mapToDto(role);
+    public void save(RoleCreateDto roleCreateDto) {
+        Role role = roleMapper.mapToEntity(roleCreateDto);
+        if (role.getName() == null) {
+            throw new IllegalArgumentException("Role must have an name");
+        }
+        roleRepository.save(role);
+
     }
 
     @Override
-    public void update(org.example.dto.RoleDto roleDto) throws NotFoundException {
-        checkRoleExist(roleDto.getId());
-        Role role = roleMapper.mapToEntity(roleDto);
-        roleRepositoryDao.add(role);
+    public void update(RoleUpdateDto roleUpdateDto){
+        Role role = roleRepository.findById(roleUpdateDto.getId()).orElseThrow(
+                () -> new NotFoundException("Role not found.")
+        );
+        role.setName(roleUpdateDto.getName());
+        roleRepository.save(role);
     }
 
     @Override
-    public org.example.dto.RoleDto findById(Long roleId) throws NotFoundException {
-        Role role = roleRepositoryDao.findById(roleId)
+    public RoleResponseDto findById(Long roleId) throws NotFoundException {
+        Role role = roleRepository.findById(roleId)
                 .orElseThrow(() ->
                         new NotFoundException("Role not found."));
         return roleMapper.mapToDto(role);
     }
 
     @Override
-    public List<org.example.dto.RoleDto> findAll() {
-        List<Role> roleList = roleRepositoryDao.findAll();
-        return roleMapper.mapToListToDto(roleList);
+    public List<RoleResponseDto> findAll() {
+        return roleRepository.findAll().stream().map(roleMapper::mapToDto).toList();
     }
 
     @Override
     public void delete(Long roleId) throws NotFoundException {
         checkRoleExist(roleId);
-        roleRepositoryDao.delete(roleId);
+        roleRepository.deleteById(roleId);
     }
 
-    private void checkRoleExist(Long roleId) throws NotFoundException {
-        if (!roleRepositoryDao.existsById(roleId)) {
+    private void checkRoleExist(Long roleId){
+        if (!roleRepository.existsById(roleId)) {
             throw new NotFoundException("Role not found.");
         }
     }

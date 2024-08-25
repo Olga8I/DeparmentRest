@@ -1,23 +1,21 @@
 package org.example.service;
 
-import org.example.dto.DepartmentDto;
-import org.example.exception.NotFoundException;
+import org.example.dto.DepartmentCreateDto;
+import org.example.dto.DepartmentResponseDto;
+import org.example.dto.DepartmentUpdateDto;
 
 
 import java.util.List;
 
 public interface DepartmentService {
-    void save(DepartmentDto departmentDto);
+    void save(DepartmentCreateDto departmentCreateDto);
 
-    void update(DepartmentDto department) throws NotFoundException;
+    void update(DepartmentUpdateDto department);
 
-    DepartmentDto findById(Long departmentId) throws NotFoundException;
+    DepartmentResponseDto findById(Long departmentId);
 
-    List<DepartmentDto> findAll();
+    List<DepartmentResponseDto> findAll();
 
-    void delete(Long departmentId) throws NotFoundException;
+    void delete(Long departmentId);
 
-    void deleteUserFromDepartment(Long departmentId, Long userId) throws NotFoundException;
-
-    void addUserToDepartment(Long departmentId, Long userId) throws NotFoundException;
 }

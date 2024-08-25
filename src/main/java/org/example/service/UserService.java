@@ -1,18 +1,19 @@
 package org.example.service;
 
-import org.example.dto.UserDto;
-import org.example.exception.NotFoundException;
+import org.example.dto.UserCreateDto;
+import org.example.dto.UserResponseDto;
+import org.example.dto.UserUpdateDto;
 
 import java.util.List;
 
 public interface UserService {
-    void save(UserDto userDto);
+    void save(UserCreateDto userCreateDto);
 
-    void update(UserDto userDto) throws NotFoundException;
+    void update(UserUpdateDto userUpdateDto);
 
-    UserDto findById(Long userId) throws NotFoundException;
+    UserResponseDto findById(Long userId);
 
-    List<UserDto> findAll();
+    List<UserResponseDto> findAll();
 
-    void delete(Long userId) throws NotFoundException;
+    void delete(Long userId);
 }

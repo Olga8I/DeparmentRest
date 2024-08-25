@@ -1,18 +1,19 @@
 package org.example.service;
 
-import org.example.dto.PhoneNumberDto;
-import org.example.exception.NotFoundException;
+import org.example.dto.PhoneNumberCreateDto;
+import org.example.dto.PhoneNumberResponseDto;
+import org.example.dto.PhoneNumberUpdateDto;
 
 import java.util.List;
 
 public interface PhoneNumberService {
-    void save(PhoneNumberDto phoneNumber);
+    void save(PhoneNumberCreateDto phoneNumberCreateDto);
 
-    void update(PhoneNumberDto phoneNumber) throws NotFoundException;
+    void update(PhoneNumberUpdateDto phoneNumberUpdateDto);
 
-    PhoneNumberDto findById(Long phoneNumberId) throws NotFoundException;
+    PhoneNumberResponseDto findById(Long phoneNumberId);
 
-    List<PhoneNumberDto> findAll();
+    List<PhoneNumberResponseDto> findAll();
 
     void delete(Long phoneNumberId);
 }

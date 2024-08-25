@@ -1,16 +1,22 @@
 package org.example.mapper;
 
-import org.example.dto.PhoneNumberDto;
+import org.example.dto.PhoneNumberCreateDto;
+import org.example.dto.PhoneNumberResponseDto;
+import org.example.dto.PhoneNumberUpdateDto;
+import org.example.dto.UserResponseDto;
 import org.example.model.PhoneNumber;
+import org.example.model.User;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 @Mapper(componentModel = "spring")
 public interface PhoneNumberMapper {
-    PhoneNumber mapToEntity(PhoneNumberDto phoneNumberDto);
+    PhoneNumber mapToEntity(PhoneNumberCreateDto phoneNumberCreateDto);
+    UserResponseDto mapToDto(User user);
+    @Mapping(source = "user", target = "userDto")
+    PhoneNumberResponseDto mapToDto (PhoneNumber phoneNumber);
 
-    PhoneNumberDto mapToDto (PhoneNumber phoneNumber);
-
-    List<PhoneNumberDto> mapToListToDto(List<PhoneNumber> phoneNumberList);
+    List<PhoneNumberUpdateDto> mapToListToDto(List<PhoneNumber> phoneNumberList);
 
 }

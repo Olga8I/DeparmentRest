@@ -1,10 +1,11 @@
 package org.example.service;
-
-import org.example.dto.UserDto;
+import org.example.dto.UserCreateDto;
+import org.example.dto.UserResponseDto;
+import org.example.dto.UserUpdateDto;
 import org.example.exception.NotFoundException;
 import org.example.mapper.UserMapper;
 import org.example.model.User;
-import org.example.repository.dao.UserRepositoryDao;
+import org.example.repository.UserRepository;
 import org.example.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,8 +13,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import java.util.ArrayList;
 
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -21,7 +22,7 @@ import static org.mockito.Mockito.*;
 class UserServiceTest {
 
     @Mock
-    private UserRepositoryDao userRepositoryDao;
+    private UserRepository userRepository;
 
     @Mock
     private UserMapper userMapper;
@@ -29,16 +30,22 @@ class UserServiceTest {
     @InjectMocks
     private UserServiceImpl userService;
 
-    private UserDto userDto;
+    private UserCreateDto userCreateDto;
+    private UserUpdateDto userUpdateDto;
+    private UserResponseDto userResponseDto;
     private User user;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        userDto = new UserDto();
-        userDto.setId(1L);
-        userDto.setFirstName("John");
-        userDto.setLastName("Doe");
+
+        userCreateDto = new UserCreateDto("John", "Doe", null);
+        userUpdateDto = new UserUpdateDto("John", "Doe", null, 1L);
+
+        userResponseDto = new UserResponseDto();
+        userResponseDto.setId(1L);
+        userResponseDto.setFirstName("John");
+        userResponseDto.setLastName("Doe");
 
         user = new User();
         user.setId(1L);
@@ -47,64 +54,67 @@ class UserServiceTest {
     }
 
     @Test
-    void testUpdateUserSuccessfully() throws NotFoundException {
-        when(userMapper.mapToEntity(userDto)).thenReturn(user);
-        when(userRepositoryDao.findAll()).thenReturn(new ArrayList<>() {{
-            add(user);
-        }});
+    void testSaveUserSuccessfully() {
+        when(userMapper.mapToEntity(userCreateDto)).thenReturn(user);
 
-        userService.update(userDto);
+        userService.save(userCreateDto);
+
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    void testUpdateUserSuccessfully() throws NotFoundException {
+        when(userMapper.mapToEntity(userCreateDto)).thenReturn(user);
+        when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(user));
+
+        userService.update(userUpdateDto);
 
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-        verify(userRepositoryDao, times(1)).add(userCaptor.capture());
+        verify(userRepository, times(1)).save(userCaptor.capture());
 
-        assertEquals(user, userCaptor.getValue());
+        assertEquals(user.getFirstName(), userCaptor.getValue().getFirstName());
+        assertEquals(user.getLastName(), userCaptor.getValue().getLastName());
     }
 
     @Test
     void testUpdateUserNotFound() {
-        userDto.setId(2L);
-        when(userRepositoryDao.findAll()).thenReturn(new ArrayList<>() {{
-            add(user);
-        }});
+        UserUpdateDto updateDto = new UserUpdateDto("Jane", "Doe", null, 2L);
+        when(userRepository.findById(2L)).thenReturn(java.util.Optional.empty());
 
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> userService.update(userDto));
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> userService.update(updateDto));
         assertEquals("User not found.", exception.getMessage());
     }
 
     @Test
     void testFindByIdUserExists() throws NotFoundException {
-        when(userRepositoryDao.findAll()).thenReturn(new ArrayList<>() {{
-            add(user);
-        }});
-        when(userRepositoryDao.findById(1L)).thenReturn(user);
-        when(userMapper.mapToDto(user)).thenReturn(userDto);
+        when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(user));
+        when(userMapper.mapToDto(user)).thenReturn(userResponseDto);
 
-        UserDto foundUserDto = userService.findById(1L);
+        UserResponseDto foundUserResponseDto = userService.findById(1L);
 
-        assertEquals(userDto, foundUserDto);
+        assertEquals(userResponseDto, foundUserResponseDto);
     }
 
     @Test
     void testFindByIdUserNotFound() {
+        when(userRepository.findById(2L)).thenReturn(java.util.Optional.empty());
+
         NotFoundException exception = assertThrows(NotFoundException.class, () -> userService.findById(2L));
         assertEquals("User not found.", exception.getMessage());
     }
 
     @Test
     void testDeleteUserSuccessfully() throws NotFoundException {
-        when(userRepositoryDao.findAll()).thenReturn(new ArrayList<>() {{
-            add(user);
-        }});
-
-        userService.delete(1L);
-        verify(userRepositoryDao, times(1)).delete(1L);
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        userService.delete(user.getId());
+        verify(userRepository).deleteById(1L);
     }
 
     @Test
     void testDeleteUserNotFound() {
+        when(userRepository.findById(2L)).thenReturn(java.util.Optional.empty());
+
         NotFoundException exception = assertThrows(NotFoundException.class, () -> userService.delete(2L));
         assertEquals("User not found.", exception.getMessage());
     }
 }
-

@@ -1,16 +1,18 @@
 package org.example.mapper;
 
-import org.example.dto.DepartmentDto;
+import org.example.dto.DepartmentCreateDto;
+import org.example.dto.DepartmentResponseDto;
 import org.example.model.Department;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface DepartmentMapper {
-    Department mapToEntity (DepartmentDto departmentDto);
+    Department mapToEntity(DepartmentCreateDto departmentCreateDto);
 
-    DepartmentDto mapToDto (Department department);
+    @Mapping(source = "userList", target = "userList")
+    DepartmentResponseDto mapToDto(Department department);
 
-    List<DepartmentDto> mapToListToDto (List<Department> departmentList);
 
 }

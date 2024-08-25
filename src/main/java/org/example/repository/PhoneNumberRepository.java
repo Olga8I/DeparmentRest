@@ -8,7 +8,4 @@ import java.util.Optional;
 @Repository
 public interface PhoneNumberRepository extends JpaRepository<PhoneNumber, Long> {
 
-    boolean existsByNumber(String number);
-
-    Optional<PhoneNumber> findByNumber(String number);
 }
