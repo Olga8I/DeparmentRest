@@ -1,8 +1,8 @@
-DROP TABLE IF EXISTS roles CASCADE;
-DROP TABLE IF EXISTS departments CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
-DROP TABLE IF EXISTS users_departments CASCADE;
 DROP TABLE IF EXISTS phone_numbers CASCADE;
+DROP TABLE IF EXISTS users_departments CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS departments CASCADE;
+DROP TABLE IF EXISTS roles CASCADE;
 
 CREATE TABLE IF NOT EXISTS roles
 (
@@ -39,12 +39,13 @@ CREATE TABLE IF NOT EXISTS phone_numbers
     user_id            BIGINT REFERENCES users (user_id)
 );
 
+-- Вставка данных
 INSERT INTO roles (role_name)
 VALUES ('Администратор'),
        ('Технический директор'),
        ('Программист Java'),
        ('Программист React'),
-       ('HR'); -- 5
+       ('HR');
 
 INSERT INTO departments (department_name)
 VALUES ('Администрация'),
@@ -81,4 +82,3 @@ VALUES ('+1(123)123 1111', 1),
        ('+1(123)123 7777', 5),
        ('+1(123)123 8888', 6),
        ('+1(123)123 9995', 7);
-
