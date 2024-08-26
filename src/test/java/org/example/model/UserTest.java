@@ -41,7 +41,7 @@ public class UserTest {
     @Test
     public void testUserInitialization() {
         assertNotNull(user);
-        assertEquals("Петя", user.getFirstName());
+        assertEquals("John", user.getFirstName());
         assertEquals("Doe", user.getLastName());
         assertEquals(role, user.getRole());
         assertEquals(2, user.getPhoneNumberList().size());

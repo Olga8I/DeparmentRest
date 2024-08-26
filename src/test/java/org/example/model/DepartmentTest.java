@@ -51,6 +51,13 @@ public class DepartmentTest {
 
         department2.setId(2L);
         assertNotEquals(department1, department2);
+
+        Object nonDepartmentObject = new Object();
+        assertNotEquals(department1, nonDepartmentObject);
+
+        assertNotEquals(department1, null);
+
+        assertEquals(department1, department1);
     }
 
     @Test

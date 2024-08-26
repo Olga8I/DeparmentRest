@@ -1,6 +1,8 @@
 package org.example.model;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,10 +24,11 @@ public class Role {
     private List<User> users;
 
     public Role() {
+        this.users = new ArrayList<>();
     }
 
     public Role(String name, List<User> users) {
-        this.users = users;
+        this.users = users != null ? users : new ArrayList<>();
         this.name = name;
     }
 
