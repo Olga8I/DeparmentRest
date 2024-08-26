@@ -8,6 +8,9 @@ import org.example.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,15 +18,19 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserMapperTest {
-
+    @InjectMocks
     private UserMapper userMapper;
-    private RoleMapper roleMapper;
 
+    @Mock
+    private RoleMapper roleMapper;
+    @Mock
+    private PhoneNumberMapper phoneNumberMapper;
+    @Mock
+    private DepartmentMapper departmentMapper;
     @BeforeEach
     void setUp() {
         userMapper = Mappers.getMapper(UserMapper.class);
-        roleMapper = Mappers.getMapper(RoleMapper.class);
-
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -47,18 +54,17 @@ class UserMapperTest {
         user.setRole(new Role("ADMIN", null));
         user.setPhoneNumberList(Arrays.asList(new PhoneNumber("1234567890", user)));
         user.setDepartmentList(new HashSet<>(Arrays.asList(new Department("HR"))));
-
-        assertNotNull(user);
-        assertEquals(user.getFirstName(), user.getFirstName());
-        assertEquals(user.getLastName(), user.getLastName());
+        UserResponseDto dto = userMapper.mapToDto(user);
+        assertNotNull(dto);
+        assertEquals(user.getFirstName(), dto.getFirstName());
+        assertEquals(user.getLastName(), dto.getLastName());
 
         assertNotNull(user.getPhoneNumberList());
-        assertEquals(1, user.getPhoneNumberList().size());
-        assertEquals("1234567890", user.getPhoneNumberList().get(0).getNumber());
+        assertEquals(1, dto.getPhoneNumberList().size());
 
         assertNotNull(user.getDepartmentList());
-        assertEquals(1, user.getDepartmentList().size());
-        assertEquals("HR", user.getDepartmentList().iterator().next().getName());
+        assertEquals(1, dto.getDepartmentList().size());
+        assertEquals("HR", dto.getDepartmentList().iterator().next().getName());
     }
 
     @Test
