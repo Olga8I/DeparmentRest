@@ -28,7 +28,7 @@ public class Role {
     }
 
     public Role(String name, List<User> users) {
-        this.users = users;
+        this.users = users != null ? users : new ArrayList<>();
         this.name = name;
     }
 
