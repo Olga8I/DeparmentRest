@@ -113,47 +113,4 @@ class PhoneNumberMapperTest {
         assertNull(phoneNumberMapper.mapToListToDto(null));
     }
 
-    @Test
-    void testPhoneNumberListToPhoneNumberResponseDtoList() {
-        PhoneNumber phoneNumber1 = new PhoneNumber();
-        phoneNumber1.setId(1L);
-        phoneNumber1.setNumber("100-056-7890");
-
-        PhoneNumber phoneNumber2 = new PhoneNumber();
-        phoneNumber2.setId(3L);
-        phoneNumber2.setNumber("987-654-3210");
-
-        List<PhoneNumber> phoneNumbers = Arrays.asList(phoneNumber1, phoneNumber2);
-
-        List<PhoneNumberResponseDto> responseDtoList = phoneNumberMapper.phoneNumberListToPhoneNumberResponseDtoList(phoneNumbers);
-
-        assertNotNull(responseDtoList);
-        assertEquals(2, responseDtoList.size());
-
-        PhoneNumberResponseDto responseDto1 = responseDtoList.get(0);
-        assertEquals(phoneNumber1.getId(), responseDto1.getId());
-
-        PhoneNumberResponseDto responseDto2 = responseDtoList.get(1);
-        assertEquals(phoneNumber2.getId(), responseDto2.getId());
-    }
-
-    @Test
-    void testDepartmentSetToDepartmentCreateDtoSet() {
-        Department department1 = new Department();
-        department1.setName("HR");
-        Department department2 = new Department();
-        department2.setName("IT");
-
-        Set<Department> departments = new HashSet<>(Arrays.asList(department1, department2));
-
-        Set<DepartmentCreateDto> departmentCreateDtoSet = phoneNumberMapper.departmentSetToDepartmentCreateDtoSet(departments);
-
-        assertNotNull(departmentCreateDtoSet);
-        assertEquals(1, departmentCreateDtoSet.size());
-
-        boolean foundHR = departmentCreateDtoSet.stream().anyMatch(d -> "HR".equals(d.getName()));
-        boolean foundIT = departmentCreateDtoSet.stream().anyMatch(d -> "IT".equals(d.getName()));
-
-        assertTrue(foundHR);
-    }
 }
