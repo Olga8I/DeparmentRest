@@ -75,7 +75,7 @@ public class PhoneNumber {
         return "PhoneNumber{" +
                 "id=" + id +
                 ", number='" + number + '\'' +
-                ", userId=" + (user != null ? user.getId() : null) +
+                ", userId=" + (user != null ? user.getId() : "null") +
                 '}';
     }
 }

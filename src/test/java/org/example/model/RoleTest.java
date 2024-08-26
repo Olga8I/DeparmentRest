@@ -19,6 +19,15 @@ class RoleTest {
     }
 
     @Test
+    void testDefaultConstructor() {
+        Role defaultRole = new Role();
+        assertNull(defaultRole.getId());
+        assertNull(defaultRole.getName());
+        assertNotNull(defaultRole.getUsers());
+        assertTrue(defaultRole.getUsers().isEmpty());
+    }
+
+    @Test
     void testConstructorAndGetters() {
         assertEquals("Admin", role.getName());
         assertTrue(role.getUsers().isEmpty());
@@ -45,25 +54,46 @@ class RoleTest {
 
     @Test
     void testEqualsAndHashCode() {
-        Role anotherRole = new Role("Admin", new ArrayList<>());
-        Role yetAnotherRole = new Role("Admin", users);
-        role.setId(1L);
-        anotherRole.setId(1L);
-        yetAnotherRole.setId(2L);
+        Role role1 = new Role("Admin", new ArrayList<>());
+        Role role2 = new Role("Admin", new ArrayList<>());
+        Role role3 = new Role("User", new ArrayList<>());
 
-        assertEquals(role, anotherRole);
-        assertNotEquals(role, yetAnotherRole);
-        assertNotEquals(role, null);
-        assertNotEquals(role, new Object());
+        role1.setId(1L);
+        role2.setId(1L);
+        role3.setId(2L);
 
-        assertEquals(role.hashCode(), anotherRole.hashCode());
-        assertNotEquals(role.hashCode(), yetAnotherRole.hashCode());
+        assertEquals(role1, role2, "Roles with same id should be equal");
+        assertNotEquals(role1, role3, "Roles with different ids should not be equal");
+
+        assertNotEquals(role1, null, "Role should not be equal to null");
+
+        assertNotEquals(role1, new Object(), "Role should not be equal to an instance of a different class");
+
+        role1.setId(null);
+        role2.setId(null);
+        assertEquals(role1, role2, "Roles with same name and null id should be equal");
+
+        assertNotEquals(role1, role3, "Roles with different names should not be equal");
+
+        assertEquals(role1.hashCode(), role2.hashCode(), "Hash codes should be equal for equivalent roles");
+        assertNotEquals(role1.hashCode(), role3.hashCode(), "Hash codes should not be equal for non-equivalent roles");
     }
+
 
     @Test
     void testSetId() {
         role.setId(1L);
         assertEquals(1L, role.getId());
     }
-}
 
+    @Test
+    void testAddUser() {
+        User user = new User();
+        users.add(user);
+        role.setUsers(users);
+        assertTrue(role.getUsers().contains(user));
+
+        user.setRole(role);
+        assertEquals(role, user.getRole());
+    }
+}

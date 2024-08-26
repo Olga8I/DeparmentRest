@@ -44,12 +44,22 @@ public class PhoneNumberResponseDtoTest {
         PhoneNumberResponseDto phoneNumberResponseDto1 = new PhoneNumberResponseDto("123456789", userResponseDto1);
         PhoneNumberResponseDto phoneNumberResponseDto2 = new PhoneNumberResponseDto("123456789", userResponseDto1);
         PhoneNumberResponseDto phoneNumberResponseDto3 = new PhoneNumberResponseDto("987654321", userResponseDto2);
+        PhoneNumberResponseDto phoneNumberResponseDto4 = new PhoneNumberResponseDto("123456789", userResponseDto2);
 
         assertEquals(phoneNumberResponseDto1, phoneNumberResponseDto2);
-        assertNotEquals(phoneNumberResponseDto1, phoneNumberResponseDto3);
         assertEquals(phoneNumberResponseDto1.hashCode(), phoneNumberResponseDto2.hashCode());
+
+        assertNotEquals(phoneNumberResponseDto1, phoneNumberResponseDto3);
         assertNotEquals(phoneNumberResponseDto1.hashCode(), phoneNumberResponseDto3.hashCode());
+
+
+        assertEquals(phoneNumberResponseDto1, phoneNumberResponseDto1);
+        assertEquals(phoneNumberResponseDto1.hashCode(), phoneNumberResponseDto1.hashCode());
+
+        assertNotEquals(phoneNumberResponseDto1, null);
+        assertNotEquals(phoneNumberResponseDto1, new Object());
     }
+
 
     @Test
     public void testToString() {

@@ -60,12 +60,14 @@ public class Department {
         if (this == o) return true;
         if (!(o instanceof Department)) return false;
         Department department = (Department) o;
-        return Objects.equals(id, department.id);
+        return Objects.equals(id, department.id) &&
+                Objects.equals(name, department.name) &&
+                Objects.equals(userList, department.userList);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id, name, userList);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package org.example.mapper;
+
 import org.example.dto.DepartmentCreateDto;
 import org.example.dto.DepartmentResponseDto;
+import org.example.dto.UserResponseDto;
 import org.example.model.Department;
 import org.example.model.PhoneNumber;
 import org.example.model.Role;
@@ -11,6 +13,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 import java.util.Set;
+import java.util.LinkedHashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,7 +31,6 @@ class DepartmentMapperTest {
         DepartmentCreateDto dto = new DepartmentCreateDto();
         dto.setName("Science Department");
 
-
         Department department = departmentMapper.mapToEntity(dto);
 
         assertNotNull(department);
@@ -38,7 +40,7 @@ class DepartmentMapperTest {
 
     @Test
     void testMapToDto() {
-        PhoneNumber phoneNumber = new PhoneNumber("877980",new User());
+        PhoneNumber phoneNumber = new PhoneNumber("877980", new User());
         User user = new User("Иван", "Ivan", new Role(), List.of(phoneNumber), null);
         Department entity = new Department();
         entity.setId(1L);

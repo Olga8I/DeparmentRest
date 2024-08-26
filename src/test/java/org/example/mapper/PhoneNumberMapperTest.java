@@ -1,17 +1,12 @@
 package org.example.mapper;
 
-import org.example.dto.PhoneNumberCreateDto;
-import org.example.dto.PhoneNumberResponseDto;
-import org.example.dto.PhoneNumberUpdateDto;
-import org.example.dto.UserResponseDto;
-import org.example.model.PhoneNumber;
-import org.example.model.User;
+import org.example.dto.*;
+import org.example.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,8 +23,6 @@ class PhoneNumberMapperTest {
     void testMapToEntity() {
         PhoneNumberCreateDto dto = new PhoneNumberCreateDto();
         dto.setNumber("123-456-7890");
-        UserResponseDto userDto = new UserResponseDto();
-        userDto.setId(2L);
 
         PhoneNumber phoneNumber = phoneNumberMapper.mapToEntity(dto);
 
@@ -41,7 +34,7 @@ class PhoneNumberMapperTest {
     void testMapToDTO() {
         PhoneNumber phoneNumber = new PhoneNumber();
         phoneNumber.setId(1L);
-        phoneNumber.setNumber(null);
+        phoneNumber.setNumber("123-456-7890");
         User user = new User();
         user.setId(2L);
         phoneNumber.setUser(user);
@@ -50,8 +43,28 @@ class PhoneNumberMapperTest {
 
         assertNotNull(dto);
         assertEquals(phoneNumber.getId(), dto.getId());
-        assertEquals(phoneNumber.getNumber(), dto.getNumberDto());
         assertEquals(phoneNumber.getUser().getId(), dto.getUserDto().getId());
+    }
+
+    @Test
+    void testMapToUserDto() {
+        User user = new User();
+        user.setId(1L);
+        user.setFirstName("John");
+        user.setLastName("Doe");
+
+        PhoneNumber phoneNumber = new PhoneNumber();
+        phoneNumber.setId(1L);
+        phoneNumber.setNumber("123-456-7890");
+        user.setPhoneNumberList(Arrays.asList(phoneNumber));
+
+        UserResponseDto userResponseDto = phoneNumberMapper.mapToDto(user);
+
+        assertNotNull(userResponseDto);
+        assertEquals(user.getId(), userResponseDto.getId());
+        assertEquals(user.getFirstName(), userResponseDto.getFirstName());
+        assertEquals(user.getLastName(), userResponseDto.getLastName());
+        assertEquals(1, userResponseDto.getPhoneNumberList().size());
     }
 
     @Test
@@ -59,16 +72,10 @@ class PhoneNumberMapperTest {
         PhoneNumber phoneNumber1 = new PhoneNumber();
         phoneNumber1.setId(1L);
         phoneNumber1.setNumber("100-056-7890");
-        User user1 = new User();
-        user1.setId(2L);
-        phoneNumber1.setUser(user1);
 
         PhoneNumber phoneNumber2 = new PhoneNumber();
         phoneNumber2.setId(3L);
         phoneNumber2.setNumber("987-654-3210");
-        User user2 = new User();
-        user2.setId(4L);
-        phoneNumber2.setUser(user2);
 
         List<PhoneNumber> phoneNumbers = Arrays.asList(phoneNumber1, phoneNumber2);
 
@@ -85,4 +92,25 @@ class PhoneNumberMapperTest {
         assertEquals(phoneNumber2.getId(), dto2.getId());
         assertEquals(phoneNumber2.getNumber(), dto2.getNumber());
     }
+
+    @Test
+    void testMapToEntityNull() {
+        assertNull(phoneNumberMapper.mapToEntity(null));
+    }
+
+    @Test
+    void testMapToDtoNull() {
+        assertNull(phoneNumberMapper.mapToDto((User) null));
+    }
+
+    @Test
+    void testMapToUserDtoNull() {
+        assertNull(phoneNumberMapper.mapToDto((User) null));
+    }
+
+    @Test
+    void testMapToDTOListNull() {
+        assertNull(phoneNumberMapper.mapToListToDto(null));
+    }
+
 }

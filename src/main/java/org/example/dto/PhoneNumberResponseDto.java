@@ -36,14 +36,16 @@ public class PhoneNumberResponseDto {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof PhoneNumberResponseDto)) return false;
         PhoneNumberResponseDto that = (PhoneNumberResponseDto) o;
-        return Objects.equals(id, that.id) && Objects.equals(numberDto, that.numberDto) && Objects.equals(userResponseDto, that.userResponseDto);
+        return Objects.equals(id, that.id) && // Сравнение id
+                Objects.equals(numberDto, that.numberDto) &&
+                Objects.equals(userResponseDto, that.userResponseDto);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, numberDto, userResponseDto);
+        return Objects.hash(id, numberDto, userResponseDto); // Включаем id в хэш-код
     }
 }
 

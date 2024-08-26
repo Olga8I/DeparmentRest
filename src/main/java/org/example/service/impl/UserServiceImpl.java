@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
-    private void checkExistUser(Long userId) throws NotFoundException {
+    public void checkExistUser(Long userId) throws NotFoundException {
         if (!userRepository.findAll().stream().anyMatch(user -> user.getId().equals(userId))) {
             throw new NotFoundException("User not found.");
         }

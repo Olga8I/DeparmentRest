@@ -1,8 +1,5 @@
 package org.example.dto;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class UserResponseDto {
     private Long id;
@@ -72,5 +69,19 @@ public class UserResponseDto {
 
     public void setDepartmentList(Set<DepartmentCreateDto> departmentList) {
         this.departmentCreateDtoList = departmentList;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserResponseDto)) return false;
+        UserResponseDto that = (UserResponseDto) o;
+        return Objects.equals(firstName, that.firstName) &&
+                Objects.equals(lastName, that.lastName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstName, lastName);
     }
 }

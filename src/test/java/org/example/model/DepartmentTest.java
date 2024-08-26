@@ -1,10 +1,8 @@
 package org.example.model;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,6 +20,13 @@ public class DepartmentTest {
         Department engineering = new Department("Engineering");
         assertEquals("Engineering", engineering.getName());
         assertNotNull(engineering.getUserList());
+    }
+
+    @Test
+    public void testDefaultConstructor() {
+        Department department = new Department();
+        assertNotNull(department.getUserList());
+        assertTrue(department.getUserList().isEmpty());
     }
 
     @Test
@@ -51,7 +56,16 @@ public class DepartmentTest {
 
         department2.setId(2L);
         assertNotEquals(department1, department2);
+
+        assertNotEquals(department1, "Some String");
+
+        assertNotEquals(department1, null);
+
+        assertEquals(department1, department1);
     }
+
+
+
 
     @Test
     public void testToString() {
@@ -74,5 +88,38 @@ public class DepartmentTest {
         users.add(user2);
 
         assertEquals(users, department.getUserList());
+    }
+
+    @Test
+    public void testSetUserList() {
+        Set<User> newUserList = new HashSet<>();
+        User user1 = new User();
+        user1.setId(1L);  // Устанавливаем id для user1
+        User user2 = new User();
+        user2.setId(2L);  // Устанавливаем id для user2
+        newUserList.add(user1);
+        newUserList.add(user2);
+
+        department.setUserList(newUserList);
+        assertEquals(newUserList, department.getUserList());
+        assertEquals(2, department.getUserList().size());
+    }
+
+
+    @Test
+    public void testUserListEmpty() {
+        assertTrue(department.getUserList().isEmpty());
+    }
+
+    @Test
+    public void testUserListAddAndRemove() {
+        User user = new User();
+        user.setId(1L);
+        department.getUserList().add(user);
+        assertTrue(department.getUserList().contains(user));
+
+        department.getUserList().remove(user);
+        assertFalse(department.getUserList().contains(user));
+        assertTrue(department.getUserList().isEmpty());
     }
 }
