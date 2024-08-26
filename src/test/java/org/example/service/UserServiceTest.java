@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -117,4 +118,41 @@ class UserServiceTest {
         NotFoundException exception = assertThrows(NotFoundException.class, () -> userService.delete(2L));
         assertEquals("User not found.", exception.getMessage());
     }
+    @Test
+    void testFindAllUsers() {
+        List<User> users = List.of(user);
+        when(userRepository.findAll()).thenReturn(users);
+        when(userMapper.mapToDto(any())).thenAnswer(invocation -> {
+            User user = invocation.getArgument(0);
+            return new UserResponseDto(user.getFirstName(), user.getLastName(), null, null, null);
+        });
+
+        List<UserResponseDto> userResponseDtos = userService.findAll();
+
+        assertEquals(1, userResponseDtos.size());
+        assertEquals(userResponseDto, userResponseDtos.get(0));
+    }
+
+    @Test
+    void testDeleteUserWithCheckExist() throws NotFoundException {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        userService.delete(1L);
+        verify(userRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    void testCheckExistUserExists() throws NotFoundException {
+        when(userRepository.findAll()).thenReturn(List.of(user));
+
+        userService.checkExistUser(1L);
+    }
+
+    @Test
+    void testCheckExistUserNotExists() {
+        when(userRepository.findAll()).thenReturn(List.of());
+
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> userService.checkExistUser(2L));
+        assertEquals("User not found.", exception.getMessage());
+    }
+
 }

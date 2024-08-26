@@ -2,6 +2,8 @@ package org.example.model;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 /**
  * Phone entity
  * Many To One: PhoneNumber - User
@@ -57,12 +59,15 @@ public class PhoneNumber {
         if (this == o) return true;
         if (!(o instanceof PhoneNumber)) return false;
         PhoneNumber that = (PhoneNumber) o;
-        return id != null && id.equals(that.id);
+        return Objects.equals(id, that.id) && // Сравнение id
+                Objects.equals(number, that.number) &&
+                Objects.equals(user != null ? user.getId() : null,
+                        that.user != null ? that.user.getId() : null);
     }
 
     @Override
     public int hashCode() {
-        return 31;
+        return Objects.hash(id, number, user != null ? user.getId() : null);
     }
 
     @Override
@@ -70,7 +75,7 @@ public class PhoneNumber {
         return "PhoneNumber{" +
                 "id=" + id +
                 ", number='" + number + '\'' +
-                ", userId=" + (user != null ? user.getId() : null) +
+                ", userId=" + (user != null ? user.getId() : "null") +
                 '}';
     }
 }
