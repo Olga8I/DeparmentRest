@@ -67,11 +67,19 @@ public class Role {
         if (this == o) return true;
         if (!(o instanceof Role)) return false;
         Role role = (Role) o;
-        return id != null && id.equals(role.id);
+
+        if (id != null && role.id != null) {
+            return id.equals(role.id);
+        }
+
+        return name != null && name.equals(role.name);
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        int result = (id != null ? id.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        return result;
     }
+
 }
