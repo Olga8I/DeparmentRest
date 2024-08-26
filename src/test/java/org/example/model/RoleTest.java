@@ -57,12 +57,14 @@ class RoleTest {
         Role role1 = new Role("Admin", new ArrayList<>());
         Role role2 = new Role("Admin", new ArrayList<>());
         Role role3 = new Role("User", new ArrayList<>());
+        Role role4 = new Role("Admin", new ArrayList<>());
 
         role1.setId(1L);
         role2.setId(1L);
         role3.setId(2L);
 
-        assertEquals(role1, role2, "Roles with same id should be equal");
+        assertEquals(role1, role2, "Roles with same id and name should be equal");
+
         assertNotEquals(role1, role3, "Roles with different ids should not be equal");
 
         assertNotEquals(role1, null, "Role should not be equal to null");
@@ -76,9 +78,13 @@ class RoleTest {
         assertNotEquals(role1, role3, "Roles with different names should not be equal");
 
         assertEquals(role1.hashCode(), role2.hashCode(), "Hash codes should be equal for equivalent roles");
-        assertNotEquals(role1.hashCode(), role3.hashCode(), "Hash codes should not be equal for non-equivalent roles");
-    }
 
+        assertNotEquals(role1.hashCode(), role3.hashCode(), "Hash codes should not be equal for non-equivalent roles");
+
+        role1.setId(null);
+        role2.setId(null);
+        assertEquals(role1.hashCode(), role2.hashCode(), "Hash codes should be equal for roles with same name and null id");
+    }
 
     @Test
     void testSetId() {

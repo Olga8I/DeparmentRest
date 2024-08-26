@@ -13,7 +13,6 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 import java.util.Set;
-import java.util.LinkedHashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -52,6 +51,11 @@ class DepartmentMapperTest {
         assertNotNull(dto);
         assertEquals(entity.getId(), dto.getId());
         assertEquals(entity.getName(), dto.getName());
+    }
+    @Test
+    void testUserToUserResponseDto_Null() {
+        UserResponseDto result = departmentMapper.userToUserResponseDto(null);
+        assertNull(result);
     }
 
 }

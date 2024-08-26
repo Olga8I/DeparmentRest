@@ -73,13 +73,26 @@ public class UserTest {
 
     @Test
     public void testEqualsAndHashCode() {
-        user.setId(1L);
+        User user1 = new User();
+        user1.setId(1L);
+
         User user2 = new User();
         user2.setId(1L);
 
-        assertEquals(user, user2);
-        assertEquals(user.hashCode(), user2.hashCode());
+        User user3 = new User();
+        user3.setId(2L);
+
+        assertEquals(user1, user2);
+        assertEquals(user1.hashCode(), user2.hashCode());
+
+        assertNotEquals(user1, user3);
+        assertNotEquals(user1.hashCode(), user3.hashCode());
+
+        assertNotEquals(user1, null);
+
+        assertNotEquals(user1, new Object());
     }
+
 
 
     @Test

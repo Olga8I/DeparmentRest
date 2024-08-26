@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,6 +34,12 @@ class RoleMapperTest {
     }
 
     @Test
+    void testMapToEntity_null() {
+        Role role = roleMapper.mapToEntity(null);
+        assertNull(role);
+    }
+
+    @Test
     void testMapToDTO() {
         Role role = new Role();
         role.setId(1L);
@@ -43,6 +50,12 @@ class RoleMapperTest {
         assertNotNull(dto);
         assertEquals(role.getId(), dto.getId());
         assertEquals(role.getName(), dto.getName());
+    }
+
+    @Test
+    void testMapToDTO_null() {
+        RoleResponseDto dto = roleMapper.mapToDto(null);
+        assertNull(dto);
     }
 
     @Test
@@ -69,5 +82,18 @@ class RoleMapperTest {
         RoleUpdateDto dto2 = dtoList.get(1);
         assertEquals(role2.getId(), dto2.getId());
         assertEquals(role2.getName(), dto2.getName());
+    }
+
+    @Test
+    void testMapToDTOList_null() {
+        List<RoleUpdateDto> dtoList = roleMapper.mapToListToDto(null);
+        assertNull(dtoList);
+    }
+
+    @Test
+    void testMapToDTOList_empty() {
+        List<RoleUpdateDto> dtoList = roleMapper.mapToListToDto(Collections.emptyList());
+        assertNotNull(dtoList);
+        assertTrue(dtoList.isEmpty());
     }
 }

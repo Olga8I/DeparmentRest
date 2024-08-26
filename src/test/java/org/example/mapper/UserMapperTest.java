@@ -32,6 +32,23 @@ class UserMapperTest {
         userMapper = Mappers.getMapper(UserMapper.class);
         MockitoAnnotations.openMocks(this);
     }
+    @Test
+    void testMapToEntity_NullDto() {
+        User user = userMapper.mapToEntity(null);
+        assertNull(user);
+    }
+
+    @Test
+    void testMapToDTO_NullUser() {
+        UserResponseDto dto = userMapper.mapToDto(null);
+        assertNull(dto);
+    }
+
+    @Test
+    void testMapToDTOList_NullUserList() {
+        List<UserUpdateDto> dtoList = userMapper.mapToListToDto(null);
+        assertNull(dtoList);
+    }
 
     @Test
     void testMapToEntity() {

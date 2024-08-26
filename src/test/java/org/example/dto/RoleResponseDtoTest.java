@@ -45,17 +45,33 @@ class RoleResponseDtoTest {
     }
 
     @Test
-    void testRoleResponseDtoEqualsDifferentIds() {
+    void testRoleResponseDtoEqualsDifferentIds()  {
         RoleResponseDto roleResponseDto1 = new RoleResponseDto();
         roleResponseDto1.setId(1L);
         roleResponseDto1.setName("User");
 
         RoleResponseDto roleResponseDto2 = new RoleResponseDto();
-        roleResponseDto2.setId(2L);
+        roleResponseDto2.setId(1L);
         roleResponseDto2.setName("User");
+        assertEquals(roleResponseDto1, roleResponseDto2);
 
-        assertNotEquals(roleResponseDto1, roleResponseDto2);
+        RoleResponseDto roleResponseDto3 = new RoleResponseDto();
+        roleResponseDto3.setId(2L);
+        roleResponseDto3.setName("User");
+        assertNotEquals(roleResponseDto1, roleResponseDto3);
+
+        RoleResponseDto roleResponseDto4 = new RoleResponseDto();
+        roleResponseDto4.setId(1L);
+        roleResponseDto4.setName("Admin");
+        assertNotEquals(roleResponseDto1, roleResponseDto4);
+
+        Object nonRoleResponseDto = new Object();
+        assertNotEquals(roleResponseDto1, nonRoleResponseDto);
+
+        assertEquals(roleResponseDto1, roleResponseDto1);
     }
+
+
 
     @Test
     void testRoleResponseDtoHashCode() {

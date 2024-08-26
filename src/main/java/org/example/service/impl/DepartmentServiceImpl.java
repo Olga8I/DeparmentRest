@@ -35,8 +35,8 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public void save(DepartmentCreateDto departmentCreateDto) {
         Department department = departmentMapper.mapToEntity(departmentCreateDto);
-        if (department.getName() == null) {
-            throw new IllegalArgumentException("Department must have an name");
+        if (departmentCreateDto.getName() == null || departmentCreateDto.getName().isEmpty()) {
+            throw new IllegalArgumentException("Department must have a name");
         }
         departmentRepository.save(department);
     }

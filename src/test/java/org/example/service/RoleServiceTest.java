@@ -16,6 +16,8 @@ import org.example.model.Role;
 import org.example.repository.RoleRepository;
 import org.example.service.impl.RoleServiceImpl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -47,16 +49,33 @@ public class RoleServiceTest {
     }
 
     @Test
+    public void testSave_WhenNameIsNull_ThrowsIllegalArgumentException() {
+        RoleCreateDto roleCreateDto = new RoleCreateDto();
+        roleCreateDto.setName(null);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            roleService.save(roleCreateDto);
+        });
+
+    }
+
+    @Test
     public void testSave() {
+        roleCreateDto = new RoleCreateDto();
+
+
         when(roleMapper.mapToEntity(roleCreateDto)).thenReturn(role);
         when(roleMapper.mapToDto(role)).thenReturn(roleResponseDto);
-        when(roleRepository.save(any(Role.class))).thenReturn(role); // Save behavior
+        when(roleRepository.save(any(Role.class))).thenReturn(role);
+        roleCreateDto.setName("Admin");
 
         roleService.save(roleCreateDto);
 
         verify(roleMapper).mapToEntity(roleCreateDto);
         verify(roleRepository).save(role);
     }
+
+
 
     @Test
     public void testUpdate_Success() throws NotFoundException {
@@ -67,7 +86,7 @@ public class RoleServiceTest {
         roleService.update(roleUpdateDto);
 
         verify(roleRepository).save(role);
-        Assertions.assertEquals("Admin Updated", role.getName());
+        assertEquals("Admin Updated", role.getName());
     }
 
     @Test
@@ -75,7 +94,7 @@ public class RoleServiceTest {
         RoleUpdateDto roleUpdateDto = new RoleUpdateDto(1L, "Admin Updated");
         when(roleRepository.findById(roleUpdateDto.getId())).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NotFoundException.class, () -> roleService.update(roleUpdateDto));
+        assertThrows(NotFoundException.class, () -> roleService.update(roleUpdateDto));
     }
 
     @Test
@@ -86,14 +105,14 @@ public class RoleServiceTest {
         RoleResponseDto foundRoleResponseDto = roleService.findById(role.getId());
 
         Assertions.assertNotNull(foundRoleResponseDto);
-        Assertions.assertEquals(roleResponseDto.getName(), foundRoleResponseDto.getName());
+        assertEquals(roleResponseDto.getName(), foundRoleResponseDto.getName());
     }
 
     @Test
     public void testFindById_RoleNotFound() {
         when(roleRepository.findById(role.getId())).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NotFoundException.class, () -> roleService.findById(role.getId()));
+        assertThrows(NotFoundException.class, () -> roleService.findById(role.getId()));
     }
 
     @Test
@@ -107,7 +126,7 @@ public class RoleServiceTest {
         List<RoleResponseDto> foundRoleResponseDtos = roleService.findAll();
 
         Assertions.assertNotNull(foundRoleResponseDtos);
-        Assertions.assertEquals(1, foundRoleResponseDtos.size());
+        assertEquals(1, foundRoleResponseDtos.size());
     }
 
     @Test
@@ -123,6 +142,6 @@ public class RoleServiceTest {
     public void testDelete_RoleNotFound() {
         when(roleRepository.existsById(role.getId())).thenReturn(false);
 
-        Assertions.assertThrows(NotFoundException.class, () -> roleService.delete(role.getId()));
+        assertThrows(NotFoundException.class, () -> roleService.delete(role.getId()));
     }
 }

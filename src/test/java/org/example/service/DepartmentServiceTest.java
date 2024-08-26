@@ -1,6 +1,7 @@
 package org.example.service;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 import org.example.dto.DepartmentCreateDto;
@@ -56,6 +57,23 @@ public class DepartmentServiceTest {
         departmentService.save(departmentCreateDto);
         verify(departmentRepository).save(department);
     }
+    @Test
+    public void testSaveDepartmentWithoutName() {
+        DepartmentCreateDto departmentCreateDto = new DepartmentCreateDto();
+        departmentCreateDto.setName(null);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            departmentService.save(departmentCreateDto);
+        });
+
+        String expectedMessage = "Department must have a name";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+        verify(departmentRepository, never()).save(department);
+    }
+
+
 
     @Test
     public void testUpdateDepartment() throws NotFoundException {

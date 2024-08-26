@@ -57,12 +57,20 @@ public class DepartmentTest {
         department2.setId(2L);
         assertNotEquals(department1, department2);
 
-        assertNotEquals(department1, "Some String");
+        department2.setId(1L);
+        department2.setName("Marketing");
+        assertNotEquals(department1, department2);
 
+        department2.setName("Engineering");
+        department2.setId(2L);
+        assertNotEquals(department1, department2);
+
+        assertNotEquals(department1, "Some String");
         assertNotEquals(department1, null);
 
         assertEquals(department1, department1);
     }
+
 
 
 

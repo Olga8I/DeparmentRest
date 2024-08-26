@@ -69,10 +69,37 @@ class UserResponseDtoTest {
         UserResponseDto user1 = new UserResponseDto("Иван", "Иванов", role1, Collections.emptyList(), Collections.emptySet());
         UserResponseDto user2 = new UserResponseDto("Иван", "Иванов", role1, Collections.emptyList(), Collections.emptySet());
         UserResponseDto user3 = new UserResponseDto("Петр", "Петров", role2, Collections.emptyList(), Collections.emptySet());
+        UserResponseDto user4 = new UserResponseDto("Иван", null, role1, Collections.emptyList(), Collections.emptySet());
+        UserResponseDto user5 = new UserResponseDto(null, "Иванов", role1, Collections.emptyList(), Collections.emptySet());
 
         assertEquals(user1, user2);
+        assertEquals(user1.hashCode(), user2.hashCode());
+
         assertNotEquals(user1, user3);
 
-        assertEquals(user1.hashCode(), user2.hashCode());
+        assertNotEquals(user1, null);
+
+        assertNotEquals(user1, new Object());
+
+        user1 = new UserResponseDto("Иван", "Иванов", role1, Collections.emptyList(), Collections.emptySet());
+        user3 = new UserResponseDto("Петр", "Иванов", role1, Collections.emptyList(), Collections.emptySet());
+        assertNotEquals(user1, user3);
+
+        user1 = new UserResponseDto("Иван", "Иванов", role1, Collections.emptyList(), Collections.emptySet());
+        user3 = new UserResponseDto("Иван", "Петров", role1, Collections.emptyList(), Collections.emptySet());
+        assertNotEquals(user1, user3);
+
+        user1 = new UserResponseDto("Иван", "Иванов", role1, Collections.emptyList(), Collections.emptySet());
+        user3 = new UserResponseDto("Петр", "Петров", role2, Collections.emptyList(), Collections.emptySet());
+        assertNotEquals(user1, user3);
+
+        user4 = new UserResponseDto("Иван", null, role1, Collections.emptyList(), Collections.emptySet());
+        user5 = new UserResponseDto(null, "Иванов", role1, Collections.emptyList(), Collections.emptySet());
+        UserResponseDto user6 = new UserResponseDto(null, null, role1, Collections.emptyList(), Collections.emptySet());
+
+        assertNotEquals(user4, user5);
+        assertNotEquals(user4, user6);
+        assertNotEquals(user5, user6);
     }
+
 }
