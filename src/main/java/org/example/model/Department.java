@@ -61,8 +61,7 @@ public class Department {
         if (!(o instanceof Department)) return false;
         Department department = (Department) o;
         return Objects.equals(id, department.id) &&
-                Objects.equals(name, department.name) &&
-                Objects.equals(userList, department.userList);
+                Objects.equals(name, department.name);
     }
 
     @Override

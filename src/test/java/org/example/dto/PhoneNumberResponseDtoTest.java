@@ -39,12 +39,18 @@ public class PhoneNumberResponseDtoTest {
     @Test
     public void testEqualsAndHashCode() {
         UserResponseDto userResponseDto1 = new UserResponseDto();
-        UserResponseDto userResponseDto2 = new UserResponseDto();
-
         PhoneNumberResponseDto phoneNumberResponseDto1 = new PhoneNumberResponseDto("123456789", userResponseDto1);
+        phoneNumberResponseDto1.setId(1L);
+
         PhoneNumberResponseDto phoneNumberResponseDto2 = new PhoneNumberResponseDto("123456789", userResponseDto1);
-        PhoneNumberResponseDto phoneNumberResponseDto3 = new PhoneNumberResponseDto("987654321", userResponseDto2);
+        phoneNumberResponseDto2.setId(1L);
+
+        PhoneNumberResponseDto phoneNumberResponseDto3 = new PhoneNumberResponseDto("987654321", userResponseDto1);
+        phoneNumberResponseDto3.setId(2L);
+
+        UserResponseDto userResponseDto2 = new UserResponseDto();
         PhoneNumberResponseDto phoneNumberResponseDto4 = new PhoneNumberResponseDto("123456789", userResponseDto2);
+        phoneNumberResponseDto4.setId(3L);
 
         assertEquals(phoneNumberResponseDto1, phoneNumberResponseDto2);
         assertEquals(phoneNumberResponseDto1.hashCode(), phoneNumberResponseDto2.hashCode());
@@ -52,11 +58,14 @@ public class PhoneNumberResponseDtoTest {
         assertNotEquals(phoneNumberResponseDto1, phoneNumberResponseDto3);
         assertNotEquals(phoneNumberResponseDto1.hashCode(), phoneNumberResponseDto3.hashCode());
 
+        assertNotEquals(phoneNumberResponseDto1, phoneNumberResponseDto4);
+        assertNotEquals(phoneNumberResponseDto1.hashCode(), phoneNumberResponseDto4.hashCode());
 
         assertEquals(phoneNumberResponseDto1, phoneNumberResponseDto1);
         assertEquals(phoneNumberResponseDto1.hashCode(), phoneNumberResponseDto1.hashCode());
 
         assertNotEquals(phoneNumberResponseDto1, null);
+
         assertNotEquals(phoneNumberResponseDto1, new Object());
     }
 
